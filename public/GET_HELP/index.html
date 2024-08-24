@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Help Request</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Emergency Help Request</h1>
+
+        <form id="helpForm">
+            <!-- Emergency Type Selection (Dropdown) -->
+            <div class="section">
+                <label for="emergencyType">Select Emergency Type:</label>
+                <select id="emergencyType" name="emergencyType" required>
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="feelingUnsafe">Feeling Unsafe</option>
+                    <option value="beingFollowed">Being Followed</option>
+                    <option value="dangerousArea">In a Dangerous Area</option>
+                    <option value="immediateAssistance">Need Immediate Assistance</option>
+                    <option value="lostDisoriented">Lost and Disoriented</option>
+                    <option value="suspiciousActivity">Witnessing Suspicious Activity</option>
+                    <option value="healthEmergency">Health Emergency</option>
+                    <option value="harassmentThreat">Harassment or Threat</option>
+                    <option value="strandedNoTransport">Stranded with No Transportation</option>
+                    <option value="trappedDangerousSituation">Trapped in a Dangerous Situation</option>
+                    <option value="domesticViolence">Domestic Violence</option>
+                    <option value="emergencyShelterNeeded">Emergency Shelter Needed</option>
+                    <option value="unwantedAttention">Unwanted Attention</option>
+                    <option value="reportCrime">Need to Report a Crime</option>
+                </select>
+            </div>
+
+            <!-- Location Section -->
+            <div class="section">
+                <label for="location">Confirm Your Location:</label>
+                <input type="text" id="location" name="location" placeholder="Auto-detecting location...">
+                <button type="button" class="location-btn">Confirm Location</button>
+            </div>
+
+            <!-- Optional Description -->
+            <div class="section">
+                <label for="description">Additional Details (Optional):</label>
+                <textarea id="description" name="description" placeholder="Add any extra details if needed..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="section">
+                <button type="submit" class="submit-btn">Request Help</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
