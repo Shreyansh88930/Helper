@@ -44,10 +44,11 @@ body {
 }
 
 .hero-section .btn {
-    padding: 12px 30px;
-    font-size: 1rem;
+    padding: 20px 40px;
+    font-size: rem;
     font-weight: 500;
-    border-radius: 25px;
+    border-radius: 50px;
+    margin: 5px;
 }
 
 .btn-warning {
@@ -59,7 +60,29 @@ body {
     color: #343a40;
 }
 
-.btn-outline-light {
-    border-color: #fff;
+/* New Button Styles */
+.btn-get-help {
+    background-color: #28a745; /* Green color for "Get Help" */
     color: #fff;
+}
+
+.btn-emergency {
+    background-color: #dc3545; /* Red color for "Emergency" */
+    color: #fff;
+}
+
+.btn-get-help:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+.btn-emergency:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+/* Button Container */
+.btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
 }
