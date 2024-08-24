@@ -145,3 +145,100 @@ p {
         padding: 8px;
     }
 }
+.footer {
+    background-color: #333; /* Dark background for contrast */
+    color: #fff; /* White text color */
+    padding: 40px 0;
+    font-family: 'Roboto', sans-serif; /* Font matching the rest of the site */
+}
+
+.footer h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.footer p {
+    font-size: 14px;
+    line-height: 24px;
+    margin-bottom: 20px;
+}
+
+.footer .app-logo img {
+    width: 140px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 20px;
+}
+
+.footer .footer-col-2 img {
+    width: 100px; /* Adjust based on your logo size */
+    margin-bottom: 10px;
+}
+
+.footer ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.footer ul li {
+    margin-bottom: 10px;
+}
+
+.footer ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer ul li a:hover {
+    color: #f0ad4e; /* Link hover color (could be adjusted to match brand colors) */
+}
+
+.footer hr {
+    border-top: 1px solid #555;
+    margin: 20px 0;
+}
+
+.footer p.copyright {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 10px;
+    color: #aaa; /* Slightly lighter color for copyright text */
+}
+
+.footer .row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+    padding: 0 15px;
+}
+
+.footer .footer-col-1, .footer .footer-col-2 {
+    flex-basis: 25%;
+}
+
+.footer .footer-col-3, .footer .footer-col-4 {
+    flex-basis: 25%;
+    text-align: left;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+        flex-basis: 100%;
+        text-align: center;
+    }
+
+    .footer .footer-col-2 img {
+        margin: 0 auto;
+    }
+}
