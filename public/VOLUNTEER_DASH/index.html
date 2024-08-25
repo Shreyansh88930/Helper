@@ -103,7 +103,17 @@
                 <a href="#">FAQ</a>
                 <a href="#">Contact Support</a>
             </section>
+
+            <!-- New section for live location tracking -->
+            <section class="map">
+                <h2>Your Live Location</h2>
+                <div id="map"></div>
+            </section>
         </main>
-    </div>
+
+    <!-- Load the Google Maps JavaScript API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKOXPiENUhiPKgddvsj3kzg3CaIyacosQ&callback=initMap" async defer></script>
+
+    <script src="dashboard.js"></script>
 </body>
 </html>

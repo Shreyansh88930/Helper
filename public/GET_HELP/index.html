@@ -3,54 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Help Request</title>
+    <title>Get Help</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQc8nvdP9XM2EEgH3eUS10JECKVR9Bl8M&libraries=places" async defer></script>
+    <script src="getHelp.js" type="module" defer></script>
 </head>
 <body>
     <div class="container">
-        <h1>Emergency Help Request</h1>
-
-        <form id="helpForm">
-            <!-- Emergency Type Selection (Dropdown) -->
-            <div class="section">
-                <label for="emergencyType">Select Emergency Type:</label>
-                <select id="emergencyType" name="emergencyType" required>
-                    <option value="" disabled selected>Select an option...</option>
-                    <option value="feelingUnsafe">Feeling Unsafe</option>
-                    <option value="beingFollowed">Being Followed</option>
-                    <option value="dangerousArea">In a Dangerous Area</option>
-                    <option value="immediateAssistance">Need Immediate Assistance</option>
-                    <option value="lostDisoriented">Lost and Disoriented</option>
-                    <option value="suspiciousActivity">Witnessing Suspicious Activity</option>
-                    <option value="healthEmergency">Health Emergency</option>
-                    <option value="harassmentThreat">Harassment or Threat</option>
-                    <option value="strandedNoTransport">Stranded with No Transportation</option>
-                    <option value="trappedDangerousSituation">Trapped in a Dangerous Situation</option>
-                    <option value="domesticViolence">Domestic Violence</option>
-                    <option value="emergencyShelterNeeded">Emergency Shelter Needed</option>
-                    <option value="unwantedAttention">Unwanted Attention</option>
-                    <option value="reportCrime">Need to Report a Crime</option>
+        <h1>Get Help</h1>
+        <form id="getHelpForm">
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <select id="description">
+                    <option value="" disabled selected>Select a situation</option>
+                    <option value="Emergency">Emergency</option>
+                    <option value="Medical">Medical</option>
+                    <option value="Accident">Accident</option>
+                    <option value="Assault">Assault</option>
+                    <option value="Vehicle Breakdown">Vehicle Breakdown</option>
+                    <option value="Lost">Lost</option>
+                    <option value="Need Directions">Need Directions</option>
+                    <option value="Suspicious Activity">Suspicious Activity</option>
+                    <option value="Technical Issue">Technical Issue</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
-
-            <!-- Location Section -->
-            <div class="section">
-                <label for="location">Confirm Your Location:</label>
-                <input type="text" id="location" name="location" placeholder="Auto-detecting location...">
-                <button type="button" class="location-btn">Confirm Location</button>
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" placeholder="Location will be detected automatically" readonly>
+                <button type="button" id="detectLocation">Detect Location</button>
             </div>
-
-            <!-- Optional Description -->
-            <div class="section">
-                <label for="description">Additional Details (Optional):</label>
-                <textarea id="description" name="description" placeholder="Add any extra details if needed..."></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="section">
-                <button type="submit" class="submit-btn">Request Help</button>
-            </div>
+            <button type="submit">Submit Request</button>
         </form>
+        <div id="map" style="height: 400px; width: 100%; margin-top: 20px;"></div>
     </div>
 </body>
 </html>

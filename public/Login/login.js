@@ -1,4 +1,4 @@
-import { auth, db } from "../firebase.js"; // Ensure db is imported
+import { auth, db } from "../firebase.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -11,7 +11,6 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     const submitButton = document.querySelector('button[type="submit"]');
 
     try {
-        // Disable the submit button to prevent multiple submissions
         submitButton.disabled = true;
         submitButton.textContent = "Logging in...";
 
@@ -21,11 +20,10 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         console.log("User logged in:", user);
 
         // Fetch additional user data from Firestore
-        const userDoc = await getDoc(doc(db, "users", user.uid)); // Assuming 'users' is your collection name
+        const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
             const userData = userDoc.data();
             console.log("User data from Firestore:", userData);
-            // Do something with the user data (e.g., store it locally, display it)
         } else {
             console.log("No user data found in Firestore");
         }
@@ -34,14 +32,13 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         messageElement.style.color = "green";
 
         setTimeout(() => {
-            window.location.href = "index.html"; // Redirect to home or dashboard page
+            window.location.href = "../VOLUNTEER_DASH/index.html"; // Redirect to Volunteer Admin page
         }, 2000);
     } catch (error) {
         console.error("Error during login:", error);
         messageElement.textContent = "Error during login: " + error.message;
         messageElement.style.color = "red";
     } finally {
-        // Re-enable the submit button in case of error
         submitButton.disabled = false;
         submitButton.textContent = "Login";
     }
