@@ -1,0 +1,208 @@
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background: radial-gradient(circle at -4% -12.9%, rgb(74, 98, 110) 0.3%, rgb(30, 33, 48) 90.2%);
+    color: #99a2ac;
+}
+
+.navbar {
+    background-color: #343a40;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+    color: #fff;
+    font-weight: 500;
+    margin-right: 1rem;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffc107;
+}
+
+.hero-section {
+    text-align: center;
+    padding: 100px 20px;
+    background-image: linear-gradient(to right, #4e54c8, #8f94fb);
+    color: #fff;
+}
+
+.hero-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.hero-section p {
+    font-size: 1.25rem;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.hero-section .btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 25px;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+}
+
+.btn-warning.text-dark {
+    color: #343a40;
+}
+
+.btn-outline-light {
+    border-color: #fff;
+    color: #fff;
+}
+
+/* Footer */
+.footer {
+    background-color: #333; /* Dark background for contrast */
+    color: #fff; /* White text color */
+    padding: 40px 0;
+    font-family: 'Roboto', sans-serif; /* Font matching the rest of the site */
+}
+
+.footer h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.footer p {
+    font-size: 14px;
+    line-height: 24px;
+    margin-bottom: 20px;
+}
+
+.footer .app-logo img {
+    width: 140px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 20px;
+}
+
+.footer .footer-col-2 img {
+    width: 100px; /* Adjust based on your logo size */
+    margin-bottom: 10px;
+}
+
+.footer ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.footer ul li {
+    margin-bottom: 10px;
+}
+
+.footer ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer ul li a:hover {
+    color: #f0ad4e; /* Link hover color (could be adjusted to match brand colors) */
+}
+
+.footer hr {
+    border-top: 1px solid #555;
+    margin: 20px 0;
+}
+
+.footer p.copyright {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 10px;
+    color: #aaa; /* Slightly lighter color for copyright text */
+}
+
+.footer .row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+    padding: 0 15px;
+}
+
+.footer .footer-col-1, .footer .footer-col-2 {
+    flex-basis: 25%;
+}
+
+.footer .footer-col-3, .footer .footer-col-4 {
+    flex-basis: 25%;
+    text-align: left;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+        flex-basis: 100%;
+        text-align: center;
+    }
+
+    .footer .footer-col-2 img {
+        margin: 0 auto;
+    }
+}
+
+
+/* 
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: none;
+}
+.btn-custom {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    width: 100%;
+}
+.btn-custom:hover {
+    background-color: #0056b3;
+}
+
+
+.form {
+    background-color: #343a40;
+} */
+
+.form-container {
+    /* max-width: 500px; */
+    margin: 50px auto;
+    background-color: #343a40 ;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(225, 219, 219, 0.1);
+    color: #343a40;
+    
+}
+.form-title {
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: #dce7ea;
+}
+
+.form .form-label {
+    color: rgb(221, 43, 43);
+}
