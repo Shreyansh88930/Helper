@@ -5,30 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volunteer Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKOXPiENUhiPKgddvsj3kzg3CaIyacosQ&callback=initMap" async defer></script>
+    <script type="module" src="dashboard.js" defer></script>
 </head>
 <body>
     <div class="dashboard">
         <header>
-            <h1>Welcome, [Name]!</h1>
+            <h1>Welcome, <span id="userName">[Name]</span>!</h1>
+            <div class="user-details">
+                <p>Email: <span id="userEmail">[Email]</span></p>
+                <p>City: <span id="userCity">[City]</span></p>
+            </div>
             <div class="status-summary">
                 <div class="status-item">
                     <h2>Pending Requests</h2>
-                    <p>5</p>
-                </div>
-                <div class="status-item">
-                    <h2>Active Requests</h2>
-                    <p>2</p>
-                </div>
-                <div class="status-item">
-                    <h2>Completed Requests</h2>
-                    <p>10</p>
+                    <p id="pendingRequests">0</p>
                 </div>
             </div>
         </header>
 
         <main>
             <section class="requests-list">
-                <h2>Help Requests</h2>
+                <h2>Pending Help Requests</h2>
                 <table>
                     <thead>
                         <tr>
@@ -39,81 +37,12 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>001</td>
-                            <td>Downtown</td>
-                            <td>Feeling Unsafe</td>
-                            <td>10:30 AM</td>
-                            <td>New</td>
-                        </tr>
-                        <!-- More rows as needed -->
+                    <tbody id="requestsTable">
+                        <!-- Dynamic content will be injected here -->
                     </tbody>
                 </table>
             </section>
-
-            <section class="active-requests">
-                <h2>Active Requests</h2>
-                <ul>
-                    <li>
-                        <div class="request-info">
-                            <h3>Request ID: 002</h3>
-                            <p>Location: Uptown</p>
-                            <p>Status: In Progress</p>
-                        </div>
-                        <div class="actions">
-                            <button>Mark as Completed</button>
-                            <button>Contact User</button>
-                        </div>
-                    </li>
-                    <!-- More items as needed -->
-                </ul>
-            </section>
-
-            <section class="notifications">
-                <h2>Notifications</h2>
-                <ul>
-                    <li>New request from Downtown at 10:30 AM</li>
-                    <!-- More notifications as needed -->
-                </ul>
-            </section>
-
-            <section class="profile">
-                <h2>Profile Information</h2>
-                <p>Name: [Name]</p>
-                <p>Email: [Email]</p>
-                <a href="#">Edit Profile</a>
-            </section>
-
-            <section class="performance">
-                <h2>Performance Statistics</h2>
-                <p>Requests Responded: 15</p>
-                <p>Average Response Time: 15 minutes</p>
-                <p>Success Rate: 90%</p>
-            </section>
-
-            <section class="settings">
-                <h2>Settings</h2>
-                <a href="#">Notification Preferences</a>
-                <a href="#">Account Settings</a>
-            </section>
-
-            <section class="help">
-                <h2>Help & Support</h2>
-                <a href="#">FAQ</a>
-                <a href="#">Contact Support</a>
-            </section>
-
-            <!-- New section for live location tracking -->
-            <section class="map">
-                <h2>Your Live Location</h2>
-                <div id="map"></div>
-            </section>
         </main>
-
-    <!-- Load the Google Maps JavaScript API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKOXPiENUhiPKgddvsj3kzg3CaIyacosQ&callback=initMap" async defer></script>
-
-    <script src="dashboard.js"></script>
+    </div>
 </body>
 </html>

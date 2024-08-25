@@ -1,50 +1,39 @@
-let map;
-let userMarker;
+import { auth, db } from '../firebase.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-function initMap() {
-    // Initialize the map
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 }, // Default location
-        zoom: 8
-    });
+// Function to display user details on the dashboard
+async function displayUserDetails(user) {
+    if (user) {
+        // Get user details from Firestore
+        const userDocs = await getDocs(collection(db, 'users'));
+        const userData = userDocs.docs.find(doc => doc.id === user.uid)?.data();
 
-    // Attempt to get the user's current location
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-            function(position) {
-                const userLatLng = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
+        if (userData) {
+            // Combine firstName and lastName
+            const fullName = `${userData.firstName} ${userData.lastName}`;
 
-                // Update the map's center and the user's marker
-                map.setCenter(userLatLng);
-
-                if (userMarker) {
-                    userMarker.setPosition(userLatLng);
-                } else {
-                    userMarker = new google.maps.Marker({
-                        position: userLatLng,
-                        map: map,
-                        title: "You are here"
-                    });
-                }
-            },
-            function() {
-                handleLocationError(true, map.getCenter());
-            }
-        );
+            // Update HTML with user details
+            document.getElementById('userName').textContent = fullName;
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userCity').textContent = userData.city;
+        } else {
+            console.error('User data not found in Firestore');
+        }
     } else {
-        // Browser doesn't support Geolocation
-        handleLocationError(false, map.getCenter());
+        // No user is signed in
+        window.location.href = 'login.html'; // Redirect to login if no user is signed in
     }
 }
 
-function handleLocationError(browserHasGeolocation, pos) {
-    new google.maps.InfoWindow({
-        content: browserHasGeolocation ?
-                'Error: The Geolocation service failed.' :
-                'Error: Your browser doesn\'t support geolocation.',
-        position: pos
-    }).open(map);
-}
+// Listen for authentication state changes
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // Display user details
+        await displayUserDetails(user);
+        // Load additional data (e.g., help requests) if necessary
+    } else {
+        // Redirect to login if user is not authenticated
+        window.location.href = 'login.html';
+    }
+});
