@@ -45,7 +45,7 @@ body {
 
 .hero-section .btn {
     padding: 20px 40px;
-    font-size: rem;
+    font-size: 1rem; /* Added unit for font-size */
     font-weight: 500;
     border-radius: 50px;
     margin: 5px;
@@ -86,6 +86,8 @@ body {
     gap: 10px;
     margin-bottom: 30px;
 }
+
+/* Footer Styles */
 .footer {
     background-color: #333; /* Dark background for contrast */
     color: #fff; /* White text color */
@@ -111,7 +113,10 @@ body {
     margin-bottom: 10px;
 }
 
-.footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+.footer .footer-col-1, 
+.footer .footer-col-2, 
+.footer .footer-col-3, 
+.footer .footer-col-4 {
     flex: 1;
     min-width: 200px;
     margin-bottom: 20px;
@@ -159,27 +164,35 @@ body {
     flex-wrap: wrap;
 }
 
-.footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+.footer .footer-col-1, 
+.footer .footer-col-2, 
+.footer .footer-col-3, 
+.footer .footer-col-4 {
     padding: 0 15px;
 }
 
-.footer .footer-col-1, .footer .footer-col-2 {
+.footer .footer-col-1,
+.footer .footer-col-2 {
     flex-basis: 25%;
 }
 
-.footer .footer-col-3, .footer .footer-col-4 {
+.footer .footer-col-3,
+.footer .footer-col-4 {
     flex-basis: 25%;
     text-align: left;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .footer .footer-col-1, .footer .footer-col-2, .footer .footer-col-3, .footer .footer-col-4 {
+    .footer .footer-col-1,
+    .footer .footer-col-2,
+    .footer .footer-col-3,
+    .footer .footer-col-4 {
         flex-basis: 100%;
         text-align: center;
     }
 
     .footer .footer-col-2 img {
-        margin:0 auto;
+        margin: 0 auto
     }
 }
