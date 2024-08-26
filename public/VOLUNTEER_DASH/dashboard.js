@@ -1,29 +1,33 @@
-import { auth, db } from '../firebase.js'; // Adjust the path as necessary
+import { auth, db } from '../firebase.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
 import { getDoc, doc, getDocs, collection, updateDoc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
 
 // Function to display the user's details on the dashboard
-async function displayUserDetails(user) {
-    if (user) {
-        try {
-            const userDoc = await getDoc(doc(db, 'volunteers', user.uid));
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                const fullName = `${userData.firstName || 'N/A'} ${userData.lastName || 'N/A'}`;
-                document.getElementById('userName').textContent = fullName;
-                document.getElementById('userEmail').textContent = user.email;
-                document.getElementById('userCity').textContent = userData.city || 'N/A';
-                document.getElementById('userPhone').textContent = userData.phone || 'N/A';
-                document.getElementById('userJoinedDate').textContent = new Date(userData.joinedDate.seconds * 1000).toLocaleDateString() || 'N/A';
-            } else {
-                console.error('User data not found in Firestore');
-            }
-        } catch (error) {
-            console.error('Error fetching user details:', error);
+function displayUserDetails(user) {
+    const userNameElement = document.getElementById('userName');
+    const userEmailElement = document.getElementById('userEmail');
+    const userCityElement = document.getElementById('userCity');
+
+    const userDocRef = doc(db, 'users', user.uid);
+    
+    getDoc(userDocRef).then(docSnap => {
+        if (docSnap.exists()) {
+            const userData = docSnap.data();
+            userNameElement.textContent = `${userData.firstName} ${userData.lastName}`;
+            userEmailElement.textContent = userData.email;
+            userCityElement.textContent = userData.city;
+        } else {
+            console.log('No such document!');
+            userNameElement.textContent = 'User data not found';
+            userEmailElement.textContent = 'User data not found';
+            userCityElement.textContent = 'User data not found';
         }
-    } else {
-        window.location.href = 'login.html';
-    }
+    }).catch(error => {
+        console.error('Error fetching user details: ', error);
+        userNameElement.textContent = 'Error fetching details';
+        userEmailElement.textContent = 'Error fetching details';
+        userCityElement.textContent = 'Error fetching details';
+    });
 }
 
 // Function to display pending help requests
@@ -44,13 +48,13 @@ async function displayPendingRequests() {
                 <td>${new Date(request.timestamp.seconds * 1000).toLocaleString() || 'N/A'}</td>
                 <td>${request.status || 'N/A'}</td>
                 <td>
-                    <button class="mark-completed-btn" onclick="markAsCompleted('${request.id}')">Mark as Completed</button>
+                    <button class="btn btn-success" onclick="markAsCompleted('${request.id}')">Mark as Completed</button>
                 </td>
             `;
             requestsTable.appendChild(row);
         });
 
-        document.getElementById('pendingRequests').textContent = requests.length;
+        document.getElementById('pendingRequests').textContent = `Pending Requests: ${requests.length}`;
     } catch (error) {
         console.error('Error fetching help requests:', error);
     }

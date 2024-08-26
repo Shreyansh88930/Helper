@@ -20,7 +20,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         console.log("User logged in:", user);
 
         // Fetch additional user data from Firestore
-        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userDoc = await getDoc(doc(db, "volunteers", user.uid)); // Adjusted collection name
         if (userDoc.exists()) {
             const userData = userDoc.data();
             console.log("User data from Firestore:", userData);
@@ -29,6 +29,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             localStorage.setItem('userName', `${userData.firstName} ${userData.lastName}`);
             localStorage.setItem('userEmail', user.email);
             localStorage.setItem('userCity', userData.city);
+            localStorage.setItem('userPhone', userData.phone);
+            localStorage.setItem('userJoinedDate', new Date(userData.joinedDate.seconds * 1000).toLocaleDateString());
         } else {
             console.log("No user data found in Firestore");
         }
