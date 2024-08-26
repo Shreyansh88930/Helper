@@ -6,6 +6,7 @@
     <title>Get Help</title>
     <link rel="stylesheet" href="styles.css">
     <script src="getHelp.js" type="module" defer></script>
+    <script src="validateContact.js" type="module" defer></script>
 </head>
 <body>
     <div class="container">
@@ -31,7 +32,8 @@
             </div>
             <div class="mb-3">
                 <label for="contact" class="form-label">Contact</label>
-                <input type="number" class="form-control" id="contact" placeholder="Enter your Contact" required>
+                <input type="tel" class="form-control" id="contact" placeholder="Enter your contact number" required>
+                <div id="contactError" class="error-message" style="color: red; display: none;">Please enter exactly 12 digits.</div>
             </div>
 
             <div class="form-group">
@@ -47,7 +49,7 @@
                 </select>
             </div>
             <button type="submit">Submit Request</button>
-            <button onclick="window.location.href='../Home/index.html'" class="back-home-btn">Back to Home</button>
+            <button type="button" onclick="window.location.href='../Home/index.html'" class="back-home-btn">Back to Home</button>
         </form>
         <div id="map"></div>
     </div>

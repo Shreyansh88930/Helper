@@ -16,6 +16,26 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+document.getElementById('contact').addEventListener('input', (e) => {
+    const contactInput = e.target;
+    const contactError = document.getElementById('contactError');
+    const value = contactInput.value;
+
+    // Remove non-digit characters
+    const digitsOnly = value.replace(/\D/g, '');
+
+    // Update input value with digits only
+    contactInput.value = digitsOnly;
+
+    // Check if the input is exactly 12 digits
+    if (digitsOnly.length !== 10) {
+        contactError.style.display = 'block'; // Show error message
+        contactError.textContent = 'Contact number must be exactly 10 digits.';
+    } else {
+        contactError.style.display = 'none'; // Hide error message
+    }
+});
+
 document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -29,6 +49,12 @@ document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
     // Get current user
     const user = auth.currentUser;
     const userId = user ? user.uid : 'anonymous'; // Use 'anonymous' if not logged in
+
+    // Check if the contact number is exactly 12 digits
+    if (contact.length !== 10) {
+        alert('Contact number must be exactly 12 digits.');
+        return;
+    }
 
     try {
         // Add a new document with a generated ID
@@ -44,5 +70,5 @@ document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
     } catch (e) {
         console.error('Error adding document: ', e);
         alert('Failed to submit request. Please try again.');
-    }
+    }
 });
