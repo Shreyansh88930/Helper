@@ -322,3 +322,13 @@ body {
         margin: 0 auto
     }
 }
+
+.col-md-3 img {
+    width: 100%;
+    cursor: pointer;
+    filter: grayscale(100%);
+}
+
+.col-md-3 img:hover {
+    filter: grayscale(0);
+}
