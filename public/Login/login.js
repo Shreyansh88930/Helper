@@ -41,5 +41,5 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = "Login";
-    }
+    }
 });

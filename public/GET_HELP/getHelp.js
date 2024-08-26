@@ -41,5 +41,5 @@ document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
     } catch (e) {
         console.error('Error adding document: ', e);
         alert('Failed to submit request. Please try again.');
-    }
+    }
 });

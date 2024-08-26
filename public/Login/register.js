@@ -55,5 +55,6 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         // Re-enable the submit button in case of error
         submitButton.disabled = false;
         submitButton.textContent = "Register";
-    }
+    }
 });
+
