@@ -9,7 +9,7 @@ function displayUserDetails(user) {
     const userCityElement = document.getElementById('userCity');
 
     const userDocRef = doc(db, 'users', user.uid);
-    
+
     getDoc(userDocRef).then(docSnap => {
         if (docSnap.exists()) {
             const userData = docSnap.data();
@@ -43,8 +43,9 @@ async function displayPendingRequests() {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${request.id || 'N/A'}</td>
-                <td>${request.city || 'N/A'}</td>
+                <td>${request.city || 'N/A'}</td> <!-- Changed to address field -->
                 <td>${request.description || 'N/A'}</td>
+                <td>${request.contact || 'N/A'}</td>
                 <td>${new Date(request.timestamp.seconds * 1000).toLocaleString() || 'N/A'}</td>
                 <td>${request.status || 'N/A'}</td>
                 <td>

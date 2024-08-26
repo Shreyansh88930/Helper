@@ -22,17 +22,20 @@ document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
     // Get form values
     const description = document.getElementById('description').value;
     const city = document.getElementById('location').value;
+    const contact = document.getElementById('contact').value; // Get contact info
     const status = 'pending'; // Default status
     const timestamp = Timestamp.fromDate(new Date()); // Current timestamp
 
-    // Use a hardcoded user ID for demonstration; replace with actual user ID from auth
-    const userId = 'user123';
+    // Get current user
+    const user = auth.currentUser;
+    const userId = user ? user.uid : 'anonymous'; // Use 'anonymous' if not logged in
 
     try {
         // Add a new document with a generated ID
         await addDoc(collection(db, 'helpRequests'), {
             description,
             city, // Store city name
+            contact, // Add contact information
             status,
             timestamp,
             userId
@@ -41,5 +44,5 @@ document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
     } catch (e) {
         console.error('Error adding document: ', e);
         alert('Failed to submit request. Please try again.');
-    }
+    }
 });
