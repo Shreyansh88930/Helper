@@ -5,30 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volunteer Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKOXPiENUhiPKgddvsj3kzg3CaIyacosQ&callback=initMap" async defer></script>
+    <script type="module" src="dashboard.js" defer></script>
 </head>
 <body>
     <div class="dashboard">
         <header>
-            <h1>Welcome, <span id="userName">[Name]</span>!</h1>
+            <h1>Welcome, [Name]!</h1>
             <div class="status-summary">
                 <div class="status-item">
                     <h2>Pending Requests</h2>
-                    <p id="pendingRequests">5</p>
+                    <p>5</p>
                 </div>
                 <div class="status-item">
                     <h2>Active Requests</h2>
-                    <p id="activeRequests">2</p>
+                    <p>2</p>
                 </div>
                 <div class="status-item">
                     <h2>Completed Requests</h2>
-                    <p id="completedRequests">10</p>
+                    <p>10</p>
                 </div>
             </div>
         </header>
 
         <main>
             <section class="requests-list">
-                <h2>Help Requests</h2>
+                <h2>Pending Help Requests</h2>
                 <table>
                     <thead>
                         <tr>
@@ -39,7 +41,7 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="requestsTableBody">
+                    <tbody>
                         <tr>
                             <td>001</td>
                             <td>Downtown</td>
@@ -54,7 +56,7 @@
 
             <section class="active-requests">
                 <h2>Active Requests</h2>
-                <ul id="activeRequestsList">
+                <ul>
                     <li>
                         <div class="request-info">
                             <h3>Request ID: 002</h3>
@@ -72,7 +74,7 @@
 
             <section class="notifications">
                 <h2>Notifications</h2>
-                <ul id="notificationsList">
+                <ul>
                     <li>New request from Downtown at 10:30 AM</li>
                     <!-- More notifications as needed -->
                 </ul>
@@ -80,16 +82,16 @@
 
             <section class="profile">
                 <h2>Profile Information</h2>
-                <p>Name: <span id="profileName">[Name]</span></p>
-                <p>Email: <span id="profileEmail">[Email]</span></p>
+                <p>Name: [Name]</p>
+                <p>Email: [Email]</p>
                 <a href="#">Edit Profile</a>
             </section>
 
             <section class="performance">
                 <h2>Performance Statistics</h2>
-                <p>Requests Responded: <span id="requestsResponded">15</span></p>
-                <p>Average Response Time: <span id="avgResponseTime">15 minutes</span></p>
-                <p>Success Rate: <span id="successRate">90%</span></p>
+                <p>Requests Responded: 15</p>
+                <p>Average Response Time: 15 minutes</p>
+                <p>Success Rate: 90%</p>
             </section>
 
             <section class="settings">
@@ -115,45 +117,5 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKOXPiENUhiPKgddvsj3kzg3CaIyacosQ&callback=initMap" async defer></script>
 
     <script src="dashboard.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const userIsLoggedIn = sessionStorage.getItem('loggedInUser');
-            
-            if (!userIsLoggedIn) {
-                window.location.href = "../Login/login.html";  // Redirect to login page if not logged in
-            } else {
-                // If logged in, fetch and display volunteer data
-                fetchVolunteerData(userIsLoggedIn);
-            }
-        });
-    
-        function fetchVolunteerData(userId) {
-            fetch(`/api/volunteer/${userId}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('userName').textContent = data.firstName + " " + data.lastName;
-                    document.getElementById('profileName').textContent = data.firstName + " " + data.lastName;
-                    document.getElementById('profileEmail').textContent = data.email;
-                    // Populate other dashboard fields as necessary
-                    // Example: updatePendingRequests(data.pendingRequests);
-                    // Example: updateActiveRequests(data.activeRequests);
-                    // Example: updateCompletedRequests(data.completedRequests);
-                })
-                .catch(error => console.error('Error fetching volunteer data:', error));
-        }
-
-        function updatePendingRequests(count) {
-            document.getElementById('pendingRequests').textContent = count;
-        }
-
-        function updateActiveRequests(count) {
-            document.getElementById('activeRequests').textContent = count;
-        }
-
-        function updateCompletedRequests(count) {
-            document.getElementById('completedRequests').textContent = count;
-        }
-    </script>
-    
 </body>
 </html>
