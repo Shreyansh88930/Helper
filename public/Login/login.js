@@ -17,7 +17,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        console.log("User logged in:", user);
+        // Store the user's ID in sessionStorage
+        sessionStorage.setItem('loggedInUser', user.uid);
 
         // Fetch additional user data from Firestore
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -32,7 +33,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         messageElement.style.color = "green";
 
         setTimeout(() => {
-            window.location.href = "../VOLUNTEER_DASH/index.html"; // Redirect to Volunteer Admin page
+            window.location.href = "../VOLUNTEER_DASH/index.html"; // Redirect to Volunteer Dashboard
         }, 2000);
     } catch (error) {
         console.error("Error during login:", error);

@@ -182,6 +182,132 @@ body {
     text-align: left;
 }
 
+.testimonials {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+}
+
+.testimonial-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.testimonial-item p {
+    font-style: italic;
+}
+
+/* News and updates section */
+.news-updates {
+    padding: 60px 0;
+    background-color: #fff;
+}
+
+.news-item {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.news-item h4 {
+    margin-bottom: 10px;
+}
+
+/* Volunteer spotlight section */
+.volunteer-spotlight {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+    text-align: center;
+}
+
+.spotlight-item {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.spotlight-item img {
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+/* Map section */
+.map-section {
+    padding: 60px 0;
+    background-color: #fff;
+}
+
+#volunteerMap {
+    width: 100%;
+    border-radius: 10px;
+}
+
+/* FAQ section */
+.faq {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+}
+
+.accordion-button {
+    background-color: #343a40;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #4e54c8;
+    background-color: #fff;
+}
+
+/* Partners section */
+.partners {
+    padding: 60px 0;
+    background-color: #fff;
+}
+
+.partners img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* CTA banner */
+.cta-banner {
+    padding: 60px 0;
+    background-color: #4e54c8;
+    color: #fff;
+    text-align: center;
+}
+
+.cta-banner .btn {
+    background-color: #8f94fb;
+    padding: 10px 20px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.cta-banner .btn:hover {
+    background-color: #4e54c8;
+}
+
+/* Blog/Resources section */
+.blog-resources {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+}
+
+.blog-post {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.blog-post h4 {
+    margin-bottom: 10px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .footer .footer-col-1,

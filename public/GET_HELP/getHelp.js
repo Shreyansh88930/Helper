@@ -4,7 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 
 // Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyBQc8nvdP9XM2EEgH3eUS10JECKVR9Bl8M",
+    apiKey: "AIzaSyDr-UzzwWiGA7jt_IMQWIjX-2fioeT_Kn4",
     authDomain: "safetyapp-cf8d9.firebaseapp.com",
     projectId: "safetyapp-cf8d9",
     storageBucket: "safetyapp-cf8d9.appspot.com",
@@ -16,6 +16,69 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+let map;
+let userMarker;
+
+// Initialize Google Map
+function initMap() {
+    // Initialize the map with a default location
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -34.397, lng: 150.644 }, // Default location
+        zoom: 8
+    });
+
+    // Attempt to get the user's current location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const userLatLng = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                // Update the map's center and the user's marker
+                map.setCenter(userLatLng);
+
+                if (userMarker) {
+                    userMarker.setPosition(userLatLng);
+                } else {
+                    userMarker = new google.maps.Marker({
+                        position: userLatLng,
+                        map: map,
+                        title: "You are here"
+                    });
+                }
+
+                // Reverse geocoding to get the address
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ location: userLatLng }, (results, status) => {
+                    if (status === "OK" && results[0]) {
+                        const address = results[0].formatted_address;
+                        document.getElementById("location").value = address;
+                    } else {
+                        alert("Geocoder failed due to: " + status);
+                    }
+                });
+            },
+            function () {
+                handleLocationError(true, map.getCenter());
+            }
+        );
+    } else {
+        // Browser doesn't support Geolocation
+        handleLocationError(false, map.getCenter());
+    }
+}
+
+function handleLocationError(browserHasGeolocation, pos) {
+    new google.maps.InfoWindow({
+        content: browserHasGeolocation ?
+            'Error: The Geolocation service failed.' :
+            'Error: Your browser doesn\'t support geolocation.',
+        position: pos
+    }).open(map);
+}
 
 // Handle form submission
 document.getElementById("getHelpForm").addEventListener("submit", async (event) => {
@@ -45,56 +108,10 @@ document.getElementById("getHelpForm").addEventListener("submit", async (event) 
     }
 });
 
-// Handle location detection
+// Detect location on button click
 document.getElementById("detectLocation").addEventListener("click", () => {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
-    } else {
-        alert("Geolocation is not supported by this browser.");
-    }
+    initMap();  // Reuse the initMap function to initialize and update the map with the user's location
 });
 
-function showPosition(position) {
-    const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-
-    // Initialize the Google Map
-    const map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat, lng },
-        zoom: 15,
-    });
-
-    // Create an AdvancedMarkerElement instead of Marker
-    new google.maps.marker.AdvancedMarkerElement({
-        position: { lat, lng },
-        map: map,
-        title: "Your Location",
-    });
-
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status === "OK" && results[0]) {
-            const address = results[0].formatted_address;
-            document.getElementById("location").value = address;
-        } else {
-            alert("Geocoder failed due to: " + status);
-        }
-    });
-}
-
-function showError(error) {
-    switch (error.code) {
-        case error.PERMISSION_DENIED:
-            alert("User denied the request for Geolocation.");
-            break;
-        case error.POSITION_UNAVAILABLE:
-            alert("Location information is unavailable.");
-            break;
-        case error.TIMEOUT:
-            alert("The request to get user location timed out.");
-            break;
-        case error.UNKNOWN_ERROR:
-            alert("An unknown error occurred.");
-        break;
-    }
-}
+// Initialize the map when the page loads
+window.onload = initMap;

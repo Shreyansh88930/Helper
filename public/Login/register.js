@@ -47,12 +47,13 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         setTimeout(() => {
             window.location.href = "login.html";
         }, 2000);
+
     } catch (error) {
-        console.error("Error during registration:", error);
-        messageElement.textContent = "Error during registration: " + error.message;
+        console.error("Error registering user:", error);
+        messageElement.textContent = "Error: " + error.message;
         messageElement.style.color = "red";
     } finally {
-        // Re-enable the submit button in case of error
+        // Enable the submit button and reset text
         submitButton.disabled = false;
         submitButton.textContent = "Register";
     }
