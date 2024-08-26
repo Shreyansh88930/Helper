@@ -1,197 +1,102 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+* {
     margin: 0;
     padding: 0;
-    background: #f2f4f6;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
     color: #333;
 }
 
-.dashboard {
-    width: 90%;
-    max-width: 1200px;
-    margin: 20px auto;
-    background: #ffffff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-header {
-    background: linear-gradient(90deg, #ff8a00, #e52e71);
-    color: #ffffff;
+.dashboard-header {
+    background-color: #3b5998;
+    color: #fff;
     padding: 20px;
     text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-header h1 {
-    margin: 0;
-    font-size: 2rem;
-    font-weight: 600;
-}
-
-.status-summary {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+.user-info {
     margin-top: 10px;
 }
 
-.status-item {
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    flex: 1;
-}
-
-.status-item h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: #333;
-}
-
-.status-item p {
-    font-size: 1.5rem;
-    margin: 5px 0 0;
-    color: #555;
+.user-info p {
+    margin: 5px 0;
 }
 
 main {
     padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
 }
 
-h2 {
-    border-bottom: 3px solid #ff8a00;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    font-size: 1.6rem;
-    color: #333;
+.requests-summary {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.requests-summary h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.requests-count {
+    font-size: 3em;
+    font-weight: bold;
+    color: #ff6347;
+}
+
+.requests-table {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.requests-table h2 {
+    background-color: #3b5998;
+    color: #fff;
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+    text-align: left;
+    margin: 0;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-table thead {
-    background: #f2f4f6;
 }
 
 table th, table td {
-    padding: 12px;
+    padding: 15px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
 
 table th {
-    font-weight: 600;
-    color: #333;
+    background-color: #f0f2f5;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
 }
 
 table tr:hover {
-    background-color: #fafafa;
+    background-color: #f1f1f1;
 }
 
-.active-requests ul {
-    list-style: none;
-    padding: 0;
-}
-
-.active-requests li {
-    background: #fff;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    padding: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.request-info {
-    flex: 1;
-}
-
-.actions {
-    display: flex;
-    gap: 10px;
-}
-
-.actions button {
-    background: #ff8a00;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.actions button:hover {
-    background: #e52e71;
-}
-
-.notifications ul, .help a, .settings a {
-    list-style: none;
-    padding: 0;
-}
-
-.notifications li {
-    background: #ffffff;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.profile, .performance, .settings, .help {
-    margin-bottom: 20px;
-}
-
-.profile a, .settings a {
-    color: #ff8a00;
-    text-decoration: none;
-}
-
-.profile a:hover, .settings a:hover {
-    text-decoration: underline;
-}
-
-.help a {
-    display: block;
-    margin-bottom: 10px;
-}
-
-.map {
-    margin-top: 20px;
-}
-
-#map {
-    width: 100%;
-    height: 400px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-@media (max-width: 768px) {
-    .status-summary {
-        flex-direction: column;
-        align-items: center;
+@media screen and (max-width: 768px) {
+    .requests-summary h2 {
+        font-size: 1.2em;
     }
 
-    .status-item {
-        margin-bottom: 10px;
-        width: 100%;
-        text-align: center;
+    .requests-count {
+        font-size: 2.5em;
     }
 
     table th, table td {
-        font-size: 0.9rem;
-        padding: 8px;
-    }
-
-    .actions button {
-        padding: 8px 15px;
-        font-size: 0.8rem
+        padding: 10px
     }
 }

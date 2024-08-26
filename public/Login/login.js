@@ -24,6 +24,11 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         if (userDoc.exists()) {
             const userData = userDoc.data();
             console.log("User data from Firestore:", userData);
+
+            // Store user details in local storage to pass to the dashboard
+            localStorage.setItem('userName', `${userData.firstName} ${userData.lastName}`);
+            localStorage.setItem('userEmail', user.email);
+            localStorage.setItem('userCity', userData.city);
         } else {
             console.log("No user data found in Firestore");
         }
