@@ -1,28 +1,42 @@
-import { auth, db } from '../firebase.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+let map;
+let userMarker;
 
-// Function to display user details on the dashboard
-async function displayUserDetails(user) {
-    if (user) {
-        // Get user details from Firestore
-        const userDocs = await getDocs(collection(db, 'users'));
-        const userData = userDocs.docs.find(doc => doc.id === user.uid)?.data();
+function initMap() {
+    // Initialize the map
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -34.397, lng: 150.644 }, // Default location
+        zoom: 8
+    });
 
-        if (userData) {
-            // Combine firstName and lastName
-            const fullName = `${userData.firstName} ${userData.lastName}`;
+    // Attempt to get the user's current location
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+            function(position) {
+                const userLatLng = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
 
-            // Update HTML with user details
-            document.getElementById('userName').textContent = fullName;
-            document.getElementById('userEmail').textContent = user.email;
-            document.getElementById('userCity').textContent = userData.city;
-        } else {
-            console.error('User data not found in Firestore');
-        }
+                // Update the map's center and the user's marker
+                map.setCenter(userLatLng);
+
+                if (userMarker) {
+                    userMarker.setPosition(userLatLng);
+                } else {
+                    userMarker = new google.maps.Marker({
+                        position: userLatLng,
+                        map: map,
+                        title: "You are here"
+                    });
+                }
+            },
+            function() {
+                handleLocationError(true, map.getCenter());
+            }
+        );
     } else {
-        // No user is signed in
-        window.location.href = 'login.html'; // Redirect to login if no user is signed in
+        // Browser doesn't support Geolocation
+        handleLocationError(false, map.getCenter());
     }
 }
 
@@ -35,5 +49,5 @@ onAuthStateChanged(auth, async (user) => {
     } else {
         // Redirect to login if user is not authenticated
         window.location.href = 'login.html';
-    }
+    }
 });

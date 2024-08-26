@@ -4,7 +4,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-aut
 
 // Initialize Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyBQc8nvdP9XM2EEgH3eUS10JECKVR9Bl8M",
+    apiKey: "AIzaSyDr-UzzwWiGA7jt_IMQWIjX-2fioeT_Kn4",
     authDomain: "safetyapp-cf8d9.firebaseapp.com",
     projectId: "safetyapp-cf8d9",
     storageBucket: "safetyapp-cf8d9.appspot.com",
@@ -41,5 +41,5 @@ document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
     } catch (e) {
         console.error('Error adding document: ', e);
         alert('Failed to submit request. Please try again.');
-    }
+    }
 });
