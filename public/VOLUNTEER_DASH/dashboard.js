@@ -40,11 +40,14 @@ function initMap() {
     }
 }
 
-function handleLocationError(browserHasGeolocation, pos) {
-    new google.maps.InfoWindow({
-        content: browserHasGeolocation ?
-                'Error: The Geolocation service failed.' :
-                'Error: Your browser doesn\'t support geolocation.',
-        position: pos
-    }).open(map);
-}
+// Listen for authentication state changes
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // Display user details
+        await displayUserDetails(user);
+        // Load additional data (e.g., help requests) if necessary
+    } else {
+        // Redirect to login if user is not authenticated
+        window.location.href = 'login.html';
+    }
+});

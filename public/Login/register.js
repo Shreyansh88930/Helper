@@ -56,5 +56,6 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         // Enable the submit button and reset text
         submitButton.disabled = false;
         submitButton.textContent = "Register";
-    }
+    }
 });
+

@@ -14,85 +14,32 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-// Handle form submission
-document.getElementById("getHelpForm").addEventListener("submit", async (event) => {
-    event.preventDefault();  // Prevent the default form submission behavior
+document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-    const description = document.getElementById("description").value;
-    const location = document.getElementById("location").value;
-    const userId = auth.currentUser ? auth.currentUser.uid : 'anonymous';  // Get the current user's ID or use 'anonymous'
+    // Get form values
+    const description = document.getElementById('description').value;
+    const city = document.getElementById('location').value;
+    const status = 'pending'; // Default status
+    const timestamp = Timestamp.fromDate(new Date()); // Current timestamp
 
-    if (description === "") {
-        alert("Please select a situation.");
-        return;
-    }
+    // Use a hardcoded user ID for demonstration; replace with actual user ID from auth
+    const userId = 'user123';
 
     try {
-        await addDoc(collection(db, "getHelpRequests"), {
-            userId: userId,
-            location: location,
-            description: description,
-            timestamp: Timestamp.fromDate(new Date()),
-            status: "pending"  // Default status
+        // Add a new document with a generated ID
+        await addDoc(collection(db, 'helpRequests'), {
+            description,
+            city, // Store city name
+            status,
+            timestamp,
+            userId
         });
-        alert("Help request submitted successfully!");
-    } catch (error) {
-        console.error("Error adding document: ", error);
-        alert("Failed to submit help request.");
+        alert('Help request submitted successfully!');
+    } catch (e) {
+        console.error('Error adding document: ', e);
+        alert('Failed to submit request. Please try again.');
     }
 });
-
-// Handle location detection
-document.getElementById("detectLocation").addEventListener("click", () => {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
-    } else {
-        alert("Geolocation is not supported by this browser.");
-    }
-});
-
-function showPosition(position) {
-    const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-
-    // Initialize the Google Map
-    const map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat, lng },
-        zoom: 15,
-    });
-
-    // Create an AdvancedMarkerElement instead of Marker
-    new google.maps.marker.AdvancedMarkerElement({
-        position: { lat, lng },
-        map: map,
-        title: "Your Location",
-    });
-
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status === "OK" && results[0]) {
-            const address = results[0].formatted_address;
-            document.getElementById("location").value = address;
-        } else {
-            alert("Geocoder failed due to: " + status);
-        }
-    });
-}
-
-function showError(error) {
-    switch (error.code) {
-        case error.PERMISSION_DENIED:
-            alert("User denied the request for Geolocation.");
-            break;
-        case error.POSITION_UNAVAILABLE:
-            alert("Location information is unavailable.");
-            break;
-        case error.TIMEOUT:
-            alert("The request to get user location timed out.");
-            break;
-        case error.UNKNOWN_ERROR:
-            alert("An unknown error occurred.");
-        break;
-    }
-}
