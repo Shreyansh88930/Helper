@@ -1,3 +1,6 @@
+import { auth } from '../firebase.js'; // Adjust the path if needed
+import { reauthenticateWithCredential, updatePassword, EmailAuthProvider } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const changePasswordForm = document.getElementById('changePasswordForm');
     const message = document.getElementById('message');
@@ -15,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Handle form submission
-    changePasswordForm.addEventListener('submit', (event) => {
+    changePasswordForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         const currentPassword = changePasswordForm.currentPassword.value;
@@ -29,28 +32,28 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const passwordData = {
-            currentPassword: currentPassword,
-            newPassword: newPasswordValue
-        };
+        const user = auth.currentUser;
 
-        // Send the password data to the server
-        fetch('/changePassword', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(passwordData)
-        })
-        .then(response => response.json())
-        .then(result => {
-            message.textContent = result.message;
-            message.style.color = result.success ? 'green' : 'red';
-        })
-        .catch(error => {
+        if (!user) {
+            message.textContent = 'No user is currently signed in.';
+            message.style.color = 'red';
+            return;
+        }
+
+        try {
+            // Re-authenticate user
+            const credential = EmailAuthProvider.credential(user.email, currentPassword);
+            await reauthenticateWithCredential(user, credential);
+
+            // Update password
+            await updatePassword(user, newPasswordValue);
+
+            message.textContent = 'Password updated successfully.';
+            message.style.color = 'green';
+        } catch (error) {
             console.error('Error changing password:', error);
             message.textContent = 'Error changing password. Please try again.';
             message.style.color = 'red';
-        });
+        }
     });
 });
