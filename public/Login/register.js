@@ -14,6 +14,8 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const city = document.getElementById('city').value;
     const state = document.getElementById('state').value;
     const zip = document.getElementById('zip').value;
+    const securityQuestion = document.getElementById('securityQuestion').value;
+    const securityAnswer = document.getElementById('securityAnswer').value;
     const messageElement = document.getElementById('message');
     const submitButton = document.querySelector('button[type="submit"]');
 
@@ -36,6 +38,8 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             city,
             state,
             zip,
+            securityQuestion,
+            securityAnswer,
             createdAt: new Date()
         });
 
@@ -56,26 +60,25 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         // Enable the submit button and reset text
         submitButton.disabled = false;
         submitButton.textContent = "Register";
-    }
+    }
 });
 
 document.getElementById('contact').addEventListener('input', (e) => {
     const contactInput = e.target;
     const contactError = document.getElementById('contactError');
-    const value = contactInput.value;
+    let value = contactInput.value;
 
-    // Remove non-digit characters
-    const digitsOnly = value.replace(/\D/g, '');
+    // Remove non-digit characters and limit input to 10 digits
+    value = value.replace(/\D/g, '').slice(0, 10);
 
     // Update input value with digits only
-    contactInput.value = digitsOnly;
+    contactInput.value = value;
 
     // Check if the input is exactly 10 digits
-    if (digitsOnly.length !== 10) {
+    if (value.length < 10) {
         contactError.style.display = 'block'; // Show error message
         contactError.textContent = 'Contact number must be exactly 10 digits.';
     } else {
         contactError.style.display = 'none'; // Hide error message
     }
 });
-
