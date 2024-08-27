@@ -39,10 +39,15 @@
     <header class="dashboard-header py-4">
         <div class="container">
             <h1 class="text-center">Volunteer Dashboard</h1>
-            <div class="user-info mt-4">
-                <p id="userName">Loading...</p>
-                <p id="userEmail">Loading...</p>
-                <p id="userCity">Loading...</p>
+            <div class="user-info mt-4 d-flex justify-content-center align-items-center">
+                <div class="text-center">
+                    <p id="userName">Loading...</p>
+                    <p id="userEmail">Loading...</p>
+                    <p id="userCity">Loading...</p>
+                    <div>
+                        <a href="../Edit_Profile/index.html" class="btn btn-primary">Edit Profile</a>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -61,14 +66,14 @@
                         <th>ID</th>
                         <th>City</th>
                         <th>Description</th>
-                        <th>Contact</th> <!-- Added Contact column -->
+                        <th>Contact</th>
                         <th>Date & Time</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="requestsTable">
-                    <tr><td colspan="7">Loading...</td></tr> <!-- Adjusted colspan -->
+                    <tr><td colspan="7">Loading...</td></tr>
                 </tbody>
             </table>
         </section>

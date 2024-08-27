@@ -33,9 +33,18 @@
             <div class="mb-3">
                 <label for="contact" class="form-label">Contact</label>
                 <input type="tel" class="form-control" id="contact" placeholder="Enter your contact number" required>
-                <div id="contactError" class="error-message" style="color: red; display: none;">Please enter exactly 12 digits.</div>
+                <div id="contactError" class="error-message" style="color: red; display: none;">Please enter exactly 10 digits.</div>
             </div>
-
+            <br>
+            <div class="mb-3">
+                <label for="gender" class="form-label">Gender</label>
+                <select class="form-select" id="gender" required>
+                    <option value="" selected>Select Gender</option>
+                    <option value="m">Male</option>
+                    <option value="f">Female</option>
+                </select>
+            </div>
+            <br>
             <div class="form-group">
                 <label for="location">City:</label>
                 <select id="location" required>

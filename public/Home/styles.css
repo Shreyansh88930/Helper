@@ -91,7 +91,7 @@ body {
 .footer {
     background-color: #333; /* Dark background for contrast */
     color: #fff; /* White text color */
-    padding: 40px 0;
+    padding: 30px 0;
     font-family: 'Roboto', sans-serif; /* Font matching the rest of the site */
 }
 
@@ -156,6 +156,7 @@ body {
     text-align: center;
     font-size: 14px;
     margin-top: 10px;
+    margin-bottom: 0;
     color: #aaa; /* Slightly lighter color for copyright text */
 }
 

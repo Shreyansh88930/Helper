@@ -59,3 +59,23 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     }
 });
 
+document.getElementById('contact').addEventListener('input', (e) => {
+    const contactInput = e.target;
+    const contactError = document.getElementById('contactError');
+    const value = contactInput.value;
+
+    // Remove non-digit characters
+    const digitsOnly = value.replace(/\D/g, '');
+
+    // Update input value with digits only
+    contactInput.value = digitsOnly;
+
+    // Check if the input is exactly 10 digits
+    if (digitsOnly.length !== 10) {
+        contactError.style.display = 'block'; // Show error message
+        contactError.textContent = 'Contact number must be exactly 10 digits.';
+    } else {
+        contactError.style.display = 'none'; // Hide error message
+    }
+});
+
