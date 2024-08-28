@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get Help</title>
+    <title>GET HELP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="getHelp.js" type="module" defer></script>
     <script src="validateContact.js" type="module" defer></script>
@@ -25,10 +26,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Get Help</h1>
+        <h1>GET HELP</h1>
         <form id="getHelpForm">
             <div class="form-group">
-                <label for="description">Description:</label>
+                <label for="description">DESCRIPTION:</label>
                 <select id="description" required>
                     <option value="" disabled selected>Select a situation</option>
                     <option value="Emergency">Emergency</option>
@@ -44,7 +45,7 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="contact" class="form-label">Contact</label>
+                <label for="contact" class="form-label">CONTACT NO.</label>
                 <input type="tel" class="form-control" id="contact" placeholder="Enter your contact number" required>
                 <div id="contactError" class="error-message" style="color: red; display: none;">Please enter exactly 10 digits.</div>
             </div>
@@ -52,22 +53,15 @@
             <div class="mb-3">
                 <label for="gender" class="form-label">Gender</label>
                 <select class="form-select" id="gender" required>
-                    <option value="" selected>Select Gender</option>
+                    <option value="" selected>SELECT GENDER</option>
                     <option value="m">Male</option>
                     <option value="f">Female</option>
                 </select>
             </div>
             <br>
             <div class="form-group">
-                <label for="location">City:</label>
-                <select id="location" required>
-                    <option value="" disabled selected>Select your city</option>
-                    <option value="New Delhi">New Delhi</option>
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Bangalore">Bangalore</option>
-                    <option value="Chennai">Chennai</option>
-                    <option value="Kolkata">Kolkata</option>
-                </select>
+                <label for="location">CITY:</label>
+                <input type="text" id="location" placeholder="Enter your city" required>
             </div>
             <button type="submit">Submit Request</button>
             <button type="button" onclick="window.location.href='../Home/index.html'" class="back-home-btn">Back to Home</button>

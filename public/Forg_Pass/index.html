@@ -5,61 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forget Password</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .container {
-            display: flex;
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .image-container {
-            flex: 1;
-            background-image: url('/api/placeholder/400/400');
-            background-size: cover;
-            background-position: center;
-        }
-        .form-container {
-            flex: 1;
-            padding: 40px;
-        }
-        h2 {
-            margin-top: 0;
-            color: #333;
-        }
-        p {
-            color: #666;
-        }
-        input[type="email"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #444;
-        }
-        #message {
-            margin-top: 10px;
-            color: red;
-        }
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #d2c2c2; /* Updated background color */
+    overflow: hidden; /* Hide overflow to avoid scrollbars */
+}
+
+.container {
+    display: flex;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 80%;
+    max-width: 800px;
+    position: relative;
+}
+
+.image-container {
+    flex: 1;
+    background-image: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExajF2YXBsZWRrNnZjNjQ5ZXR6YWNuc3B3NmVsZGlqNnVrbnA4bTdrcyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MDJ9IbxxvDUQM/giphy.gif'); /* Added GIF */
+    background-size: cover;
+    background-position: center;
+}
+
+.form-container {
+    flex: 1;
+    padding: 40px;
+}
+
+h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+p {
+    color: #666;
+}
+
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #444;
+}
+
+#message {
+    margin-top: 10px;
+    color: red;
+}
+
     </style>
 </head>
 <body>
