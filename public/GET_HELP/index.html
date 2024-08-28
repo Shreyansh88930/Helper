@@ -7,11 +7,24 @@
     <link rel="stylesheet" href="styles.css">
     <script src="getHelp.js" type="module" defer></script>
     <script src="validateContact.js" type="module" defer></script>
+    <!-- MapmyIndia Map SDK -->
+    <script src="https://apis.mapmyindia.com/advancedmaps/v1/f0901418c9b1deb823ea2e4a532d9ffd/map_load?v=1.5"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+        .container {
+            margin: 20px;
+        }
+        p {
+            color: #555; /* Corrected color code */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Back to Home button -->
-
         <h1>Get Help</h1>
         <form id="getHelpForm">
             <div class="form-group">
@@ -54,13 +67,15 @@
                     <option value="Bangalore">Bangalore</option>
                     <option value="Chennai">Chennai</option>
                     <option value="Kolkata">Kolkata</option>
-                    <!-- Add more cities as needed -->
                 </select>
             </div>
             <button type="submit">Submit Request</button>
             <button type="button" onclick="window.location.href='../Home/index.html'" class="back-home-btn">Back to Home</button>
         </form>
         <div id="map"></div>
+        <p id="status"></p>
+        <button id="findLocationBtn">Get My Location</button>
     </div>
+    <script src="getHelp.js" type="module"></script>
 </body>
 </html>

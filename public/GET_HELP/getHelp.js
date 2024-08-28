@@ -16,59 +16,114 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Handle contact number input
 document.getElementById('contact').addEventListener('input', (e) => {
     const contactInput = e.target;
     const contactError = document.getElementById('contactError');
     const value = contactInput.value;
 
-    // Remove non-digit characters
     const digitsOnly = value.replace(/\D/g, '');
-
-    // Update input value with digits only
     contactInput.value = digitsOnly;
 
-    // Check if the input is exactly 10 digits
     if (digitsOnly.length !== 10) {
-        contactError.style.display = 'block'; // Show error message
+        contactError.style.display = 'block';
         contactError.textContent = 'Contact number must be exactly 10 digits.';
     } else {
-        contactError.style.display = 'none'; // Hide error message
+        contactError.style.display = 'none';
     }
 });
 
+// Handle form submission
 document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Get form values
     const description = document.getElementById('description').value;
     const city = document.getElementById('location').value;
-    const contact = document.getElementById('contact').value; // Get contact info
-    const status = 'pending'; // Default status
-    const timestamp = Timestamp.fromDate(new Date()); // Current timestamp
+    const contact = document.getElementById('contact').value;
+    const status = 'pending';
+    const timestamp = Timestamp.fromDate(new Date());
 
-    // Get current user
+    // Get current position
+    const position = window.currentPosition;
+    if (!position) {
+        alert('Unable to get current location. Please try again.');
+        return;
+    }
+    const { latitude: lat, longitude: lng } = position;
+
     const user = auth.currentUser;
-    const userId = user ? user.uid : 'anonymous'; // Use 'anonymous' if not logged in
+    const userId = user ? user.uid : 'anonymous';
 
-    // Check if the contact number is exactly 12 digits
     if (contact.length !== 10) {
-        alert('Contact number must be exactly 12 digits.');
+        alert('Contact number must be exactly 10 digits.');
         return;
     }
 
     try {
-        // Add a new document with a generated ID
         await addDoc(collection(db, 'helpRequests'), {
             description,
-            city, // Store city name
-            contact, // Add contact information
+            city,
+            contact,
             status,
             timestamp,
-            userId
+            userId,
+            location: { lat, lng } // Store the location coordinates
         });
         alert('Help request submitted successfully!');
     } catch (e) {
         console.error('Error adding document: ', e);
         alert('Failed to submit request. Please try again.');
-    }
+    }
 });
+
+// MapmyIndia location finder code
+document.getElementById('findLocationBtn').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        document.getElementById('status').textContent = 'Locating...';
+
+        // Request high accuracy location
+        navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true });
+    } else {
+        document.getElementById('status').textContent = 'Geolocation is not supported by this browser.';
+    }
+});
+
+function showPosition(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+
+    document.getElementById('status').textContent = `Latitude: ${lat}, Longitude: ${lng}`;
+
+    // Store the current position globally for use in form submission
+    window.currentPosition = { latitude: lat, longitude: lng };
+
+    var map = new MapmyIndia.Map('map', {
+        center: [lat, lng],
+        zoom: 15,
+        zoomControl: true,
+        hybrid: true
+    });
+
+    new MapmyIndia.Marker({
+        position: [lat, lng],
+        map: map,
+        title: 'You are here'
+    });
+}
+
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            document.getElementById('status').textContent = 'User denied the request for Geolocation.';
+            break;
+        case error.POSITION_UNAVAILABLE:
+            document.getElementById('status').textContent = 'Location information is unavailable.';
+            break;
+        case error.TIMEOUT:
+            document.getElementById('status').textContent = 'The request to get user location timed out.';
+            break;
+        case error.UNKNOWN_ERROR:
+            document.getElementById('status').textContent = 'An unknown error occurred.';
+            break;
+    }
+}

@@ -1,42 +1,57 @@
-import { auth, db } from "../firebase.js"; // Importing auth and db from your firebase.js
-import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+// Import necessary Firebase modules
+import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-// Handle the form submission
-document.getElementById("forgotPasswordForm").addEventListener("submit", async function(event) {
-    event.preventDefault();
+// Initialize Firebase Authentication
+const auth = getAuth();
 
-    const email = document.getElementById("email").value;
-    const securityQuestion = document.getElementById("securityQuestion").value;
-    const securityAnswer = document.getElementById("securityAnswer").value;
-    const messageElement = document.getElementById("message");
+// Function to send a password reset email
+function resetPassword(email) {
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      console.log("Password reset email sent!");
+      alert("Password reset email has been sent. Please check your inbox.");
+      // You can add additional actions here, like redirecting to a different page
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error(`Error [${errorCode}]: ${errorMessage}`);
+      alert(`Failed to send password reset email: ${errorMessage}`);
+      // Handle errors here
+    });
+}
 
-    try {
-        // Retrieve the user document from Firestore
-        const userDocRef = doc(db, "users", email);
-        const userDoc = await getDoc(userDocRef);
+// Example usage:
+// You can call the function when the user submits the reset password form
+document.getElementById("resetPasswordForm").addEventListener("submit", function (e) {
+  e.preventDefault(); // Prevent the form from submitting normally
+  const email = document.getElementById("email").value;
+  resetPassword(email);
+});
 
-        if (!userDoc.exists()) {
-            messageElement.textContent = "Error: Email not found.";
-            messageElement.style.color = "red";
-            return;
-        }
+$("btn-resetPassword").click(function()
+{
+    var auth = firebase.auth();
+    var email= $("email").val();
 
-        const userData = userDoc.data();
+    if(email != "")
+    {
+        auth.sendPasswordResetEmail(email).then(function()
+        {
+            window.alert("Email has been sent to you, Please check and verify.");
+        })
+        .catch(function(error)
+        {
+            var errorCode=error.code;
+            var errorMessage= error.message;
 
-        // Check if the security question and answer match
-        if (
-            userData.securityQuestion === securityQuestion &&
-            userData.securityAnswer === securityAnswer
-        ) {
-            // Redirect to the change password page
-            window.location.href = "change-password.html";
-        } else {
-            messageElement.textContent = "Error: Security question or answer does not match.";
-            messageElement.style.color = "red";
-        }
-    } catch (error) {
-        console.error("Error checking security question and answer:", error);
-        messageElement.textContent = "Error: " + error.message;
-        messageElement.style.color = "red";
+            console.log(errorCode);
+            console.log(errorMessage);
+
+            window.alert("Message:" + errorMessage);
+        });
+    }
+    else{
+        window.alert("Please write your email first.");
     }
 });
