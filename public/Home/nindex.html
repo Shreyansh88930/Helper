@@ -1,63 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page - Safety Initiative</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="styles.css" rel="stylesheet">
-    <script src="scripts.js"></script>
+    <title>Safety Initiative</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+<body>
+    <div class="header">
         <div class="container">
-            <a class="navbar-brand" href="index.html">Safety Initiative</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="nindex.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about-us">About Us</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../VOLUNTEER_DASH/index.html">Volunteer Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact Us</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Logout</a>
-                    </li>
-                </ul>
+            <div class="navbar">
+                <div class="logo">
+                    <a href="index.html"><img src="images/Ulogo.png" width="145px"></a>
+                </div>
+                <nav>
+                    <ul id="MenuItems">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="">About</a></li>
+                        <li><a href="">Contact</a></li>
+                        <li><a href="../VOLUNTEER_DASH/index.html">Volunteer Dashboard</a></li>
+                        <li><a href="index.html">Logout</a></li>
+                    </ul>
+                    <div class="hover-line"></div>
+                </nav>
+                <img src="menu.png" class="menu-icon" onclick="menutoggle()">
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="cont">
+                    <h1>Safety Initiative</h1>
+                    <p>Your safety is our priority. Join our community of volunteers and make a difference.</p>
+                    <a href="" class="btn">Get Help</a>
+                    <a href="../VOLUNTEER_DASH/index.html" class="btn">Your Dashboard &#8594;</a>
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="testimonial">
+        
+        <div class="small-container">
+            <h2 class="title">Latest News and Updates</h2>
+            <div class="row">
+                <div class="col-3">
+                    <h3>New Volunteer Program Launched</h3>
+    
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+                        the industry's standard dummy text ever</p>
+                    
+                    <a href="#">Read More</a>
+                </div>
+                <div class="col-3">
+                    <h3>Safety Workshop</h3>
+    
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+                        the industry's standard dummy text ever</p>
+                    
+                    <a href="#">Read More</a>
+                </div>
+                <div class="col-3">
+                    <h3>App Update</h3>
+    
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+                        the industry's standard dummy text ever</p>
+                    
+                    <a href="#">Read More</a>
+                </div>
             </div>
         </div>
-    </nav>
+        
+    </div>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container text-center">
-            <h1>Ensuring Safety for All</h1>
-            <p>Your safety is our priority. Join our community of volunteers and make a difference.</p>
-            <div class="btn-container">
-                <a href="../GET_HELP/index.html" class="btn btn-get-help">GET HELP</a>
-                <a href="emergency.html" class="btn btn-emergency">EMERGENCY</a>
+    <div class="testimonial">
+        <div class="small-container">
+            <h2 class="title">Volunteer Spotlight</h2>
+            <div class="row">
+                <div class="col-3">
+                    <i class="fa fa-quote-left"></i>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+                        the industry's standard dummy text ever</p>
+                    <img src="user-1.png">
+                    <h3>Emma James</h3>
+                </div>
+                <div class="col-3">
+                    <i class="fa fa-quote-left"></i>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+                        the industry's standard dummy text ever</p>
+                    <img src="user-2.png">
+                    <h3>Luke Hobbs</h3>
+                </div>
+                <div class="col-3">
+                    <i class="fa fa-quote-left"></i>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+                        the industry's standard dummy text ever</p>
+                    <img src="user-3.png">
+                    <h3>Mia Anthon</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="cta-banner">
+        <div class="cont">
+            <h1>Join the Movement for Everyone's Safety</h1>
+            <p>Your involvement can make a difference. Volunteer with us or support our mission today!</p>
+            <a href="../Login/register.html" class="btn">Get Involved</a>
+        </div>
     </section>
+    
 
     <section class="testimonials">
         <div class="container">
-            <h2>What People Are Saying</h2>
+            <h2 class="title">What People are Saying</h2>
             <div class="testimonial-item">
                 <p>"Safety Initiative helped me when I felt unsafe. I am so grateful for their quick response!"</p>
                 <h4>- A Beneficiary</h4>
@@ -69,208 +133,145 @@
         </div>
     </section>
 
-    <!-- News and updates section -->
-    <section class="news-updates">
-        <div class="container">
-            <h2>Latest News & Updates</h2>
+    <div class="testimonial">
+        
+        <div class="small-container">
+            <h2 class="title">Latest Articles and Resources</h2>
             <div class="row">
-                <div class="col-md-4">
-                    <div class="news-item">
-                        <h4>New Volunteer Program Launched</h4>
-                        <p>We have launched a new program that allows more flexible volunteering options...</p>
-                        <a href="#">Read more</a>
-                    </div>
+                <div class="col-3">
+                    <h3>Self-Defense Techniques</h3>
+    
+                    <p>Learn essential self-defense moves to protect yourself in dangerous situations...</p>
+                    
+                    <a href="#">Read More</a>
                 </div>
-                <div class="col-md-4">
-                    <div class="news-item">
-                        <h4>Safety Workshop</h4>
-                        <p>Join our upcoming workshop to learn how to stay safe and protect others...</p>
-                        <a href="#">Read more</a>
-                    </div>
+                <div class="col-3">
+                    <h3>Know Your Rights</h3>
+    
+                    <p>Learn about your legal rights and what to do if they're violated...</p>
+                    
+                    <a href="#">Read More</a>
                 </div>
-                <div class="col-md-4">
-                    <div class="news-item">
-                        <h4>App Update</h4>
-                        <p>Our app has been updated with new features to improve user experience...</p>
-                        <a href="#">Read more</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Volunteer spotlight section -->
-    <section class="volunteer-spotlight">
-        <div class="container">
-            <h2>Volunteer Spotlight</h2>
-            <div class="spotlight-item">
-                <img src="user-1.png" alt="Volunteer Image" width="150">
-                <h4>Jane Doe</h4>
-                <p>Jane has been a part of our initiative for over a year, assisting more than 50 people...</p>
-                <a href="#">Read her story</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Map section -->
-    <section class="map-section">
-        <div class="container">
-            <h2>Find Volunteers Near You</h2>
-            <div id="volunteerMap" style="height: 400px;"></div>
-        </div>
-    </section>
-
-    <!-- FAQ section -->
-    <section class="faq">
-        <div class="container">
-            <h2>Frequently Asked Questions</h2>
-            <div class="accordion" id="faqAccordion">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                            How do I request help?
-                        </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            You can request help through our website or mobile app. Simply click the "Get Help" button and fill out the necessary details.
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingTwo">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            How do I become a volunteer?
-                        </button>
-                    </h2>
-                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            To become a volunteer, sign up on our website under the "Volunteer" section. You will be guided through the necessary steps.
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingThree">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                            What safety measures are in place?
-                        </button>
-                    </h2>
-                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            We ensure that all volunteers are thoroughly vetted and trained to handle various situations safely and effectively.
-                        </div>
-                    </div>
+                <div class="col-3">
+                    <h3>How to Volunteer Effectively</h3>
+    
+                    <p>Make the most of your volunteer efforts with these tips...</p>
+                    
+                    <a href="#">Read More</a>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Partners section -->
-    <section class="partners">
-        <div class="container">
-            <h2>Our Partners</h2>
-            <div class="row">
-                <div class="col-md-3">
-                    <img src="logo-godrej.png" alt="Partner Logo">
-                </div>
-                <div class="col-md-3">
-                    <img src="logo-oppo.png" alt="Partner Logo">
-                </div>
-                <div class="col-md-3">
-                    <img src="logo-paypal.png" alt="Partner Logo">
-                </div>
-                <div class="col-md-3">
-                    <img src="logo-philips.png" alt="Partner Logo">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA banner -->
-    <section class="cta-banner">
-        <div class="container">
-            <h2>Join the Movement for Everyone's Safety</h2>
-            <p>Your involvement can make a difference. Volunteer with us or support our mission today!</p>
-            <a href="../Login/register.html" class="btn">Get Involved</a>
-        </div>
-    </section>
-
-    <!-- Blog/Resources section -->
-    <section class="blog-resources">
-        <div class="container">
-            <h2>Latest Articles & Resources</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="blog-post">
-                        <h4>Self-Defense Techniques</h4>
-                        <p>Learn essential self-defense moves to protect yourself in dangerous situations...</p>
-                        <a href="#">Read more</a>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="blog-post">
-                        <h4>Know Your Rights</h4>
-                        <p>Learn about your legal rights and what to do if they're violated...</p>
-                        <a href="#">Read more</a>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="blog-post">
-                        <h4>How to Volunteer Effectively</h4>
-                        <p>Make the most of your volunteer efforts with these tips...</p>
-                        <a href="#">Read more</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <script src="scripts.js"></script>
-
-</body>
-<div class="footer">
-    <div class="container">
-        <div class="row">
-            <!-- Download App Section -->
-            <div class="footer-col-1">
-                <h3>Download Our App</h3>
-                <p>Get real-time support and connect with volunteers near you. Available on Android and iOS.</p>
-                <div class="app-logo">
-                    <img src="play-store.png" alt="Download on Google Play">
-                    <img src="app-store.png" alt="Download on the App Store">
-                </div>
-            </div>
-            <!-- About Us Section -->
-            <div class="footer-col-2" id="about-us">
-                <h3>About Safety Initiative</h3>
-                <p>We are a volunteer-based organization dedicated to ensuring the safety of individuals across India. Our mission is to provide immediate assistance to those who feel unsafe, offering a supportive community that stands ready to help.</p>
-            </div>
-            <!-- Useful Links Section -->
-            <div class="footer-col-3">
-                <h3>Useful Links</h3>
-                <ul>
-                    <li><a href="#">How It Works</a></li>
-                    <li><a href="#">Safety Resources</a></li>
-                    <li><a href="#">Donate</a></li>
-                </ul>
-            </div>
-            <!-- Follow Us Section -->
-            <div class="footer-col-4">
-                <h3>Follow Us</h3>
-                <p>Stay connected and help spread the word about safety. Follow us on social media.</p>
-                <ul>
-                    <li><a href="#">Facebook</a></li>
-                    <li><a href="#">Twitter</a></li>
-                    <li><a href="#">Instagram</a></li>
-                    <li><a href="#">YouTube</a></li>
-                </ul>
-            </div>
-        </div>
-        <hr>
-        <p class="copyright">© 2024 Women's Safety Initiative. All Rights Reserved.</p>
+        
     </div>
-</div>
+
+
+    <section id="faq" class="faq-section">
+        <h2 class="title">Frequently Asked Questions</h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question">How do I request help?</button>
+                <div class="faq-answer">
+                    <p>You can request help through our website or mobile app. Simply click the "Get Help" button and fill out the necessary details.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">How do I become a volunteer?</button>
+                <div class="faq-answer">
+                    <p>To become a volunteer, sign up on our website under the "Volunteer" section. You will be guided through the necessary steps.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">What safety measures are in place?</button>
+                <div class="faq-answer">
+                    <p>We ensure that all volunteers are thoroughly vetted and trained to handle various situations safely and effectively.</p>
+                </div>
+            </div>
+            <!-- Add more FAQ items as needed -->
+        </div>
+    </section>
+    
+
+
+
+    <!--FOOTER-->
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <!-- Download App Section -->
+                <div class="footer-col-1">
+                    <h3>Download Our App</h3>
+                    <p>Get real-time support and connect with volunteers near you. Available on Android and iOS.</p>
+                    <div class="app-logo">
+                        <img src="images/play-store.png" alt="Download on Google Play">
+                        <img src="images/app-store.png" alt="Download on the App Store">
+                    </div>
+                </div>
+                <!-- About Us Section -->
+                <div class="footer-col-2">
+                    <h3>About Women's Safety Initiative</h3>
+                    <p>We are a volunteer-based organization dedicated to ensuring the safety of individuals across India. Our mission is to provide immediate assistance to those who feel unsafe, offering a supportive community that stands ready to help.</p>
+                </div>
+                <!-- Useful Links Section -->
+                <div class="footer-col-3">
+                    <h3>Useful Links</h3>
+                    <ul>
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">Volunteer Registration</a></li>
+                        <li><a href="#">Safety Resources</a></li>
+                        <li><a href="#">Donate</a></li>
+                    </ul>
+                </div>
+                <!-- Follow Us Section -->
+                <div class="footer-col-4">
+                    <h3>Follow Us</h3>
+                    <p>Stay connected and help spread the word about safety. Follow us on social media.</p>
+                    <ul>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <p class="copyright">© 2024 Women's Safety Initiative. All Rights Reserved.</p>
+        </div>
+    </div>
+    
+
+    <script>
+        var Menuitems = document.getElementById("MenuItems");
+        MenuItems.style.maxHeight = "0px";
+
+        function menutoggle() {
+            if (MenuItems.style.maxHeight == "0px") {
+                MenuItems.style.maxHeight = "200px";
+            }
+            else {
+                MenuItems.style.maxHeight = "0px";
+            }
+        }
+
+
+        document.querySelectorAll('.faq-question').forEach(item => {
+            item.addEventListener('click', event => {
+                const currentlyActive = document.querySelector('.faq-question.active');
+                if (currentlyActive && currentlyActive !== item) {
+                    currentlyActive.classList.remove('active');
+                    currentlyActive.nextElementSibling.style.display = 'none';
+                }
+                item.classList.toggle('active');
+                const answer = item.nextElementSibling;
+                if (answer.style.display === 'block') {
+                    answer.style.display = 'none';
+                } else {
+                    answer.style.display = 'block';
+                }
+            });
+        });
+        
+    </script>
+</body>
+
 </html>
+
