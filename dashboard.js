@@ -162,5 +162,5 @@ onAuthStateChanged(auth, async (user) => {
         await displayPendingRequests(userCity); // Display pending requests
     } else {
         window.location.href = 'login.html'; // Redirect to login page if not authenticated
-    }
+    }
 });
