@@ -51,7 +51,8 @@ async function displayUserDetails(user) {
             userNameElement.textContent = `${userData.firstName} ${userData.lastName}`;
             userEmailElement.textContent = userData.email;
             userCityElement.textContent = userData.city;
-            return userData.city; // Return the user's city for use in displaying help requests
+            console.log('User Details:', userData); // Debug logging
+            return userData; // Return user data for use in displaying help requests
         } else {
             console.log('No such document!');
             userNameElement.textContent = 'User data not found';
@@ -68,7 +69,7 @@ async function displayUserDetails(user) {
     }
 }
 
-// Function to display pending help requests and nearest request
+// Function to display pending help requests and sort by distance
 async function displayPendingRequests(userCity) {
     try {
         if (!userCity) {
@@ -81,23 +82,27 @@ async function displayPendingRequests(userCity) {
         const requestsSnapshot = await getDocs(q);
         const requests = requestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Get current location of volunteer
-        const { latitude: volunteerLat, longitude: volunteerLng } = await getCurrentLocation();
+        // Get current location
+        const location = await getCurrentLocation();
+        console.log('Current Location:', location); // Debug logging
 
-        // Calculate distances and sort requests
+        // Calculate distance for each request and sort by distance
         requests.forEach(request => {
-            const { location: { lat, lng } } = request;
-            request.distance = haversineDistance(volunteerLat, volunteerLng, lat, lng);
+            request.distance = haversineDistance(
+                location.latitude,
+                location.longitude,
+                request.location.lat,
+                request.location.lng
+            );
         });
 
         requests.sort((a, b) => a.distance - b.distance);
 
+        // Update requests table
         const requestsTable = document.getElementById('requestsTable');
         requestsTable.innerHTML = '';
 
-        let nearestDistance = 'N/A'; // Initialize nearest distance
-
-        requests.forEach((request, index) => {
+        requests.forEach(request => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${request.id || 'N/A'}</td>
@@ -108,19 +113,19 @@ async function displayPendingRequests(userCity) {
                 <td id="status-${request.id}">${request.status || 'N/A'}</td>
                 <td>
                     <button class="btn btn-success mark-completed-btn" data-id="${request.id}">Mark as Completed</button>
-                    <a href="https://www.google.com/maps/dir/?api=1&origin=${volunteerLat},${volunteerLng}&destination=${request.location.lat},${request.location.lng}" target="_blank" class="btn btn-primary">Navigate to Location</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${request.location.lat},${request.location.lng}" target="_blank" class="btn btn-primary">Navigate to Location</a>
                 </td>
             `;
             requestsTable.appendChild(row);
-
-            // Set nearest distance for the first request
-            if (index === 0) {
-                nearestDistance = `${request.distance.toFixed(2)} km`;
-            }
         });
 
         document.getElementById('pendingRequests').textContent = `Pending Requests: ${requests.length}`;
-        document.getElementById('nearestRequest').textContent = `Nearest Request Distance: ${nearestDistance}`;
+
+        // Display the distance of the nearest request
+        const nearestRequestDistance = requests.length > 0 ? `${requests[0].distance.toFixed(2)} km` : 'N/A';
+        document.getElementById('nearestRequest').textContent = `Nearest Request Distance: ${nearestRequestDistance}`;
+
+        addEventListeners(); // Add event listeners to newly added buttons
     } catch (error) {
         console.error('Error fetching help requests:', error);
     }
@@ -138,8 +143,11 @@ async function markAsCompleted(requestId) {
         // Update the status in the UI
         document.getElementById(`status-${requestId}`).textContent = 'Completed';
 
-        const userCity = await displayUserDetails(auth.currentUser); // Refresh user details to get city
-        await displayPendingRequests(userCity); // Refresh the requests list
+        const user = auth.currentUser; // Refresh user details to get city
+        const userData = await displayUserDetails(user); // Refresh user details
+        if (userData) {
+            await displayPendingRequests(userData.city); // Refresh the requests list
+        }
     } catch (error) {
         console.error('Error marking request as completed:', error);
     }
@@ -158,8 +166,10 @@ function addEventListeners() {
 // Initialize Firebase Authentication state observer
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        const userCity = await displayUserDetails(user); // Ensure user details are displayed
-        await displayPendingRequests(userCity); // Display pending requests
+        const userData = await displayUserDetails(user); // Ensure user details are displayed
+        if (userData) {
+            await displayPendingRequests(userData.city); // Display pending requests
+        }
     } else {
         window.location.href = 'login.html'; // Redirect to login page if not authenticated
     }
