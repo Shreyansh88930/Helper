@@ -68,7 +68,7 @@ async function displayUserDetails(user) {
     }
 }
 
-// Function to display pending help requests for the user's city
+// Function to display pending help requests and nearest request
 async function displayPendingRequests(userCity) {
     try {
         if (!userCity) {
@@ -81,10 +81,23 @@ async function displayPendingRequests(userCity) {
         const requestsSnapshot = await getDocs(q);
         const requests = requestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+        // Get current location of volunteer
+        const { latitude: volunteerLat, longitude: volunteerLng } = await getCurrentLocation();
+
+        // Calculate distances and sort requests
+        requests.forEach(request => {
+            const { location: { lat, lng } } = request;
+            request.distance = haversineDistance(volunteerLat, volunteerLng, lat, lng);
+        });
+
+        requests.sort((a, b) => a.distance - b.distance);
+
         const requestsTable = document.getElementById('requestsTable');
         requestsTable.innerHTML = '';
 
-        requests.forEach(request => {
+        let nearestDistance = 'N/A'; // Initialize nearest distance
+
+        requests.forEach((request, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${request.id || 'N/A'}</td>
@@ -95,15 +108,19 @@ async function displayPendingRequests(userCity) {
                 <td id="status-${request.id}">${request.status || 'N/A'}</td>
                 <td>
                     <button class="btn btn-success mark-completed-btn" data-id="${request.id}">Mark as Completed</button>
-                    <a href="https://maps.mapmyindia.com/?ll=${request.latitude},${request.longitude}&dlat=${request.latitude}&dlng=${request.longitude}" target="_blank" class="btn btn-primary">Navigate to Location</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&origin=${volunteerLat},${volunteerLng}&destination=${request.location.lat},${request.location.lng}" target="_blank" class="btn btn-primary">Navigate to Location</a>
                 </td>
             `;
             requestsTable.appendChild(row);
+
+            // Set nearest distance for the first request
+            if (index === 0) {
+                nearestDistance = `${request.distance.toFixed(2)} km`;
+            }
         });
 
         document.getElementById('pendingRequests').textContent = `Pending Requests: ${requests.length}`;
-
-        addEventListeners(); // Add event listeners to newly added buttons
+        document.getElementById('nearestRequest').textContent = `Nearest Request Distance: ${nearestDistance}`;
     } catch (error) {
         console.error('Error fetching help requests:', error);
     }
@@ -145,5 +162,5 @@ onAuthStateChanged(auth, async (user) => {
         await displayPendingRequests(userCity); // Display pending requests
     } else {
         window.location.href = 'login.html'; // Redirect to login page if not authenticated
-    }
+    }
 });
