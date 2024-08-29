@@ -1,0 +1,86 @@
+/* style.css */
+
+body {
+    background: radial-gradient(circle, #fff, #ffd6d6);
+    color: #000; /* General text color */
+}
+
+.navbar {
+    background-color: #d2c2c2;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #000; /* Text color for links */
+}
+
+.navbar-dark .navbar-brand {
+    color: #000; /* Navbar brand text color */
+}
+
+.card {
+    background-color: #d2c2c2;
+    border: 1px solid #000; /* Border color for card */
+    border-radius: 8px;
+}
+
+.card-title {
+    color: #000; /* Card title color */
+}
+
+.form-label {
+    color: #000; /* Color for form labels */
+}
+
+.form-control, .form-select {
+    background-color: #fff;
+    border: 1px solid #000; /* Border color for form controls */
+    color: #000; /* Text color inside form controls */
+}
+
+.form-control::placeholder, .form-select option {
+    color: #000; /* Placeholder and select option color */
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #000; /* Focus border color */
+    box-shadow: none; /* Remove focus shadow to keep design clean */
+}
+
+/* Ensure placeholder text color is black */
+.form-control::placeholder {
+    color: #000;
+    opacity: 1; /* Ensures placeholder text color is applied */
+}
+
+/* Ensure placeholder text color stays black on focus */
+.form-control:focus::placeholder {
+    color: #000;
+}
+
+.btn-warning {
+    background-color: #d2c2c2;
+    border: 1px solid #000; /* Border color for button */
+    color: #000; /* Button text color */
+    border-radius: 4px; /* Rounded corners for button */
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transition for hover effects */
+}
+
+.btn-warning.text-dark {
+    color: #000; /* Ensures button text color */
+}
+
+.btn-warning:hover {
+    background-color: #b2a1a1; /* Hover state background color for button */
+    color: #000; /* Hover state text color */
+    border-color: #8c8c8c; /* Darker border color on hover */
+}
+
+.btn-bottom {
+    border-bottom: 1px solid #000; /* Very thin black border at the bottom */
+}
+
+#message {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #000; /* Message text color */
+}
