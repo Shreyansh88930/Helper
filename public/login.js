@@ -1,4 +1,4 @@
-import { auth, db } from "../firebase.js";
+import { auth, db } from "./firebase.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -40,7 +40,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
         setTimeout(() => {
             console.log("Redirecting to Volunteer Dashboard...");
-            window.location.href = "../VOLUNTEER_DASH/index.html"; // Redirect to Volunteer Admin page
+            window.location.href = "Vd.html"; // Redirect to Volunteer Admin page
         }, 2000);
     } catch (error) {
         console.error("Error during login:", error);

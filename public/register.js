@@ -1,4 +1,4 @@
-import { auth, db } from "../firebase.js"; // Update path if necessary
+import { auth, db } from "./firebase.js"; // Update path if necessary
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -9,6 +9,8 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const lastName = document.getElementById('lastName').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const contact = document.getElementById('contact').value;
+    const gender = document.getElementById('gender').value; // Added gender field
     const address = document.getElementById('address').value;
     const address2 = document.getElementById('address2').value;
     const city = document.getElementById('city').value;
@@ -29,10 +31,13 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
         console.log("User registered:", user);
 
+        // Save user details to Firestore
         await setDoc(doc(db, "users", user.uid), {
             firstName,
             lastName,
             email,
+            contact,   // Save contact field
+            gender,    // Save gender field
             address,
             address2,
             city,
@@ -63,6 +68,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     }
 });
 
+// Contact field validation
 document.getElementById('contact').addEventListener('input', (e) => {
     const contactInput = e.target;
     const contactError = document.getElementById('contactError');

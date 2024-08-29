@@ -1,4 +1,4 @@
-import { auth } from '../firebase.js'; // Adjust the path if needed
+import { auth } from './firebase.js'; // Adjust the path if needed
 import { reauthenticateWithCredential, updatePassword, EmailAuthProvider } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
