@@ -69,7 +69,16 @@ document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
             userId,
             location: { lat, lng } // Store the location coordinates
         });
-        alert('Help request submitted successfully!');
+
+        // Disable the submit button
+        const submitButton = document.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        // Show success popup and redirect after OK is clicked
+        if (confirm('Help request submitted successfully! Click OK to return to the home page.')) {
+            window.location.href = 'index.html';
+        }
+
     } catch (e) {
         console.error('Error adding document: ', e);
         alert('Failed to submit request. Please try again.');
@@ -127,3 +136,8 @@ function showError(error) {
             break;
     }
 }
+
+// Handle "Back To Home" button click
+document.getElementById('backToHomeBtn').addEventListener('click', () => {
+    window.location.href = 'index.html';
+});

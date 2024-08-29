@@ -22,6 +22,21 @@
         p {
             color: #555; /* Corrected color code */
         }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .submit-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .submit-container button {
+            width: 100%;
+            max-width: 300px; /* Optional: Set a max width */
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -63,12 +78,16 @@
                 <label for="location">CITY:</label>
                 <input type="text" id="location" placeholder="Enter your city" required>
             </div>
-            <button type="submit">Submit Request</button>
-            <button type="button" onclick="window.location.href='index.html'" class="back-home-btn">Back to Home</button>
         </form>
         <div id="map"></div>
         <p id="status"></p>
         <button id="findLocationBtn">Get My Location</button>
+        <div class="submit-container">
+            <button type="submit" id="submitRequestBtn">Submit Request</button>
+        </div>
+        <div class="submit-container">
+            <button id="backToHomeBtn">Back To Home</button>
+        </div>
     </div>
     <script src="getHelp.js" type="module"></script>
 </body>
