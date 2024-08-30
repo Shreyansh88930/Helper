@@ -10,7 +10,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const contact = document.getElementById('contact').value;
-    const gender = document.getElementById('gender').value; // Added gender field
+    const gender = document.getElementById('gender').value;
     const address = document.getElementById('address').value;
     const address2 = document.getElementById('address2').value;
     const city = document.getElementById('city').value;
@@ -22,7 +22,6 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const submitButton = document.querySelector('button[type="submit"]');
 
     try {
-        // Disable the submit button to prevent multiple submissions
         submitButton.disabled = true;
         submitButton.textContent = "Registering...";
 
@@ -31,13 +30,12 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
         console.log("User registered:", user);
 
-        // Save user details to Firestore
         await setDoc(doc(db, "users", user.uid), {
             firstName,
             lastName,
             email,
-            contact,   // Save contact field
-            gender,    // Save gender field
+            contact,
+            gender,
             address,
             address2,
             city,
@@ -62,29 +60,54 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         messageElement.textContent = "Error: " + error.message;
         messageElement.style.color = "red";
     } finally {
-        // Enable the submit button and reset text
         submitButton.disabled = false;
         submitButton.textContent = "Register";
     }
 });
 
-// Contact field validation
-document.getElementById('contact').addEventListener('input', (e) => {
-    const contactInput = e.target;
-    const contactError = document.getElementById('contactError');
-    let value = contactInput.value;
+function autoFillCity(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
 
-    // Remove non-digit characters and limit input to 10 digits
-    value = value.replace(/\D/g, '').slice(0, 10);
+    const apiKey = 'f0901418c9b1deb823ea2e4a532d9ffd';
+    const reverseGeocodeUrl = `https://apis.mapmyindia.com/advancedmaps/v1/${apiKey}/rev_geocode?lat=${lat}&lng=${lng}`;
 
-    // Update input value with digits only
-    contactInput.value = value;
+    fetch(reverseGeocodeUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Reverse Geocoding Data:', data); // Debug output
+            if (data.results && data.results.length > 0) {
+                const address = data.results[0];
+                const city = address.city || '';
+                const zip = address.pincode || '';
 
-    // Check if the input is exactly 10 digits
-    if (value.length < 10) {
-        contactError.style.display = 'block'; // Show error message
-        contactError.textContent = 'Contact number must be exactly 10 digits.';
+                console.log('City:', city); // Debug output
+                console.log('Zip:', zip); // Debug output
+
+                // Auto-fill only city and zip code
+                document.getElementById('city').value = city;
+                document.getElementById('zip').value = zip;
+            } else {
+                console.warn('No results found for the location.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching address:', error);
+        });
+}
+
+function handleLocationError() {
+    console.error('Unable to retrieve your location.');
+}
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(autoFillCity, handleLocationError);
     } else {
-        contactError.style.display = 'none'; // Hide error message
+        console.error('Geolocation is not supported by this browser.');
     }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    getLocation();
 });
