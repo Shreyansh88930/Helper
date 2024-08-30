@@ -106,6 +106,9 @@ function showPosition(position) {
     // Store the current position globally for use in form submission
     window.currentPosition = { latitude: lat, longitude: lng };
 
+    // Call the reverse geocoding function to get the city name
+    getCityName(lat, lng);
+
     var map = new MapmyIndia.Map('map', {
         center: [lat, lng],
         zoom: 15,
@@ -118,6 +121,22 @@ function showPosition(position) {
         map: map,
         title: 'You are here'
     });
+}
+
+function getCityName(lat, lng) {
+    const apiKey = 'f0901418c9b1deb823ea2e4a532d9ffd';
+    const reverseGeocodeUrl = `https://apis.mapmyindia.com/advancedmaps/v1/${apiKey}/rev_geocode?lat=${lat}&lng=${lng}`;
+
+    fetch(reverseGeocodeUrl)
+        .then(response => response.json())
+        .then(data => {
+            const city = data.results[0].city;
+            document.getElementById('location').value = city;
+        })
+        .catch(error => {
+            console.error('Error fetching city name:', error);
+            document.getElementById('status').textContent = 'Failed to retrieve city name.';
+        });
 }
 
 function showError(error) {
