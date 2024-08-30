@@ -9,7 +9,7 @@ body {
 }
 
 
-.navbar {
+/* .navbar {
     display: flex;
     align-items: center;
     padding: 20px;
@@ -45,7 +45,7 @@ nav ul li::after {
 
 nav ul li:hover::after {
     width: 100%; 
-}
+} */
 
 
 /* #MenuItems {
@@ -98,6 +98,28 @@ nav ul li {
         position: relative;
     }
 } */
+
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+nav {
+    flex: 1;
+    text-align: right;
+}
+
+nav ul {
+    display: inline-block;
+    list-style-type: none;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
 
 .menu-icon {
     width: 28px;
@@ -354,6 +376,9 @@ small {
 }
 
 .footer p {
+    color: #8a8a8a;
+}
+.footer a {
     color: #8a8a8a;
 }
 
@@ -789,7 +814,7 @@ form a {
 
 
 @media only screen and (max-width: 800px) {
-    nav ul {
+    /* nav ul {
         position: absolute;
         top: 60px;
         right: 0;
@@ -814,5 +839,31 @@ form a {
     .menu-icon {
         display: block;
         cursor: pointer;
+    } */
+    nav ul {
+        position: absolute;
+        top: 80px;
+        left: 0;
+        background: #333;
+        width: 100%;
+        overflow: hidden;
+        transition: max-height 0.5s;
+    }
+
+    nav ul li {
+        display: block;
+        margin-right: 50px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    nav ul li a {
+        color: #fff;
+    }
+
+    .menu-icon {
+        display: block;
+        cursor: pointer;
     }
 }
+
