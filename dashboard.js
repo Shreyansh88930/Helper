@@ -174,3 +174,20 @@ onAuthStateChanged(auth, async (user) => {
         window.location.href = 'login.html'; // Redirect to login page if not authenticated
     }
 });
+import { signOut } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+
+// Function to handle logout
+function handleLogout() {
+    signOut(auth).then(() => {
+        console.log('User signed out.');
+        window.location.href = 'login.html'; // Redirect to the login page
+    }).catch((error) => {
+        console.error('Error during sign out:', error);
+    });
+}
+
+// Add event listener to the logout link
+document.getElementById('logoutLink').addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent the default link behavior
+    handleLogout(); // Call the logout function
+});
