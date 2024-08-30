@@ -7,9 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Gh.css">
     <script src="getHelp.js" type="module" defer></script>
-    <script src="validateContact.js" type="module" defer></script>
-    <!-- MapmyIndia Map SDK -->
-    <script src="https://apis.mapmyindia.com/advancedmaps/v1/f0901418c9b1deb823ea2e4a532d9ffd/map_load?v=1.5"></script>
+    <!-- Leaflet for maps -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         #map {
             width: 100%;
@@ -20,7 +20,7 @@
             margin: 20px;
         }
         p {
-            color: #555; /* Corrected color code */
+            color: #555;
         }
         .form-group {
             margin-bottom: 15px;
@@ -32,10 +32,34 @@
         }
         .submit-container button {
             width: 100%;
-            max-width: 300px; /* Optional: Set a max width */
+            max-width: 300px;
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
+        }
+        .error-message {
+            color: red;
+            display: none;
+        }
+        .success-message {
+            color: green;
+        }
+        .alert {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        .alert.success {
+            background-color: #4caf50; /* Green */
+        }
+        .alert.error {
+            background-color: #f44336; /* Red */
         }
     </style>
 </head>
@@ -59,35 +83,44 @@
                     <option value="Other">Other</option>
                 </select>
             </div>
-            <div class="mb-3">
-                <label for="contact" class="form-label">CONTACT NO.</label>
-                <input type="tel" class="form-control" id="contact" placeholder="Enter your contact number" required>
-                <div id="contactError" class="error-message" style="color: red; display: none;">Please enter exactly 10 digits.</div>
+            <div class="form-group">
+                <label for="contact">CONTACT NO.:</label>
+                <input type="tel" id="contact" placeholder="Enter your contact number" required>
+                <div id="contactError" class="error-message">Please enter exactly 10 digits.</div>
             </div>
-            <br>
-            <div class="mb-3">
-                <label for="gender" class="form-label">Gender</label>
-                <select class="form-select" id="gender" required>
+            <div class="form-group">
+                <label for="gender">GENDER:</label>
+                <select id="gender" required>
                     <option value="" selected>SELECT GENDER</option>
                     <option value="m">Male</option>
                     <option value="f">Female</option>
                 </select>
             </div>
-            <br>
             <div class="form-group">
-                <label for="location">CITY:</label>
-                <input type="text" id="location" placeholder="Enter your city" required readonly>
+                <label for="stateSelect">STATE:</label>
+                <select id="stateSelect" required>
+                    <option value="" disabled selected>Select a state</option>
+                    <!-- State options will be populated by JavaScript -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="citySelect">CITY:</label>
+                <select id="citySelect" required>
+                    <option value="" disabled selected>Select a city</option>
+                    <!-- City options will be populated by JavaScript -->
+                </select>
             </div>
         </form>
         <div id="map"></div>
         <p id="status"></p>
         <button id="findLocationBtn">Get My Location</button>
         <div class="submit-container">
-            <button type="submit" id="submitRequestBtn">Submit Request</button>
+            <button type="button" id="submitRequestBtn">Submit Request</button>
         </div>
         <div class="submit-container">
             <button id="backToHomeBtn">Back To Home</button>
         </div>
+        <div id="formMessage" class="success-message" style="margin-top: 20px;"></div> <!-- Placeholder for messages -->
     </div>
     <script src="getHelp.js" type="module"></script>
 </body>

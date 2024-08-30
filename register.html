@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="UTF-8">
-    <title>Registration Form | Safety Initiative</title>
-    <link rel="stylesheet" href="lr.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="./firebase.js"></script>
-    <script type="module" src="register.js"></script>
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <title>Registration Form | Safety Initiative</title>
+  <link rel="stylesheet" href="lr.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="./firebase.js"></script>
+  <script type="module" src="register.js"></script>
+</head>
 <body>
   <nav class="navbar">
     <div class="navbar-container">
@@ -43,7 +43,7 @@
           </div>
           <div class="input-box">
             <span class="details">Email</span>
-            <input type="text" placeholder="Enter your email" id="email" required>
+            <input type="email" placeholder="Enter your email" id="email" required>
           </div>
           <div class="input-box">
             <span class="details">Phone Number</span>
@@ -51,11 +51,11 @@
           </div>
           <div class="input-box">
             <span class="details">Password</span>
-            <input type="text" placeholder="Enter your password" id="password" required>
+            <input type="password" placeholder="Enter your password" id="password" required>
           </div>
           <div class="input-box">
             <span class="details">Confirm Password</span>
-            <input type="text" placeholder="Confirm your password" required>
+            <input type="password" placeholder="Confirm your password" required>
           </div>
           <div class="input-box">
             <span class="details">Address</span>
@@ -66,50 +66,17 @@
             <input type="text" placeholder="Enter apartment, studio, or floor" id="address2" required>
           </div>
           <div class="input-box">
-            <span class="details">City</span>
-            <input type="text" placeholder="City" id="city" required readonly>
-          </div>
-          <div class="input-box">
             <span class="details">State</span>
             <select class="form-select" id="state" required>
               <option value="" selected>Select State</option>
-              <!-- Indian states options -->
-              <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-              <option value="Andhra Pradesh">Andhra Pradesh</option>
-              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-              <option value="Assam">Assam</option>
-              <option value="Bihar">Bihar</option>
-              <option value="Chandigarh">Chandigarh</option>
-              <option value="Chhattisgarh">Chhattisgarh</option>
-              <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-              <option value="Delhi">Delhi</option>
-              <option value="Goa">Goa</option>
-              <option value="Gujarat">Gujarat</option>
-              <option value="Haryana">Haryana</option>
-              <option value="Himachal Pradesh">Himachal Pradesh</option>
-              <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-              <option value="Jharkhand">Jharkhand</option>
-              <option value="Karnataka">Karnataka</option>
-              <option value="Kerala">Kerala</option>
-              <option value="Ladakh">Ladakh</option>
-              <option value="Lakshadweep">Lakshadweep</option>
-              <option value="Madhya Pradesh">Madhya Pradesh</option>
-              <option value="Maharashtra">Maharashtra</option>
-              <option value="Manipur">Manipur</option>
-              <option value="Meghalaya">Meghalaya</option>
-              <option value="Mizoram">Mizoram</option>
-              <option value="Nagaland">Nagaland</option>
-              <option value="Odisha">Odisha</option>
-              <option value="Puducherry">Puducherry</option>
-              <option value="Punjab">Punjab</option>
-              <option value="Rajasthan">Rajasthan</option>
-              <option value="Sikkim">Sikkim</option>
-              <option value="Tamil Nadu">Tamil Nadu</option>
-              <option value="Telangana">Telangana</option>
-              <option value="Tripura">Tripura</option>
-              <option value="Uttar Pradesh">Uttar Pradesh</option>
-              <option value="Uttarakhand">Uttarakhand</option>
-              <option value="West Bengal">West Bengal</option>
+              <!-- States will be populated dynamically -->
+            </select>
+          </div>
+          <div class="input-box">
+            <span class="details">City</span>
+            <select class="form-select" id="city" required>
+              <option value="" selected>Select City</option>
+              <!-- Cities will be populated dynamically -->
             </select>
           </div>
           <div class="input-box">
@@ -166,6 +133,64 @@
             menu.style.marginTop = '0'; // Reset margin-top
         }
     });
+
+    // Fetch and populate states
+    async function loadStates() {
+      try {
+        const response = await fetch('https://api.countrystatecity.in/v1/countries/IN/states', {
+          method: 'GET',
+          headers: {
+            'X-CSCAPI-KEY': 'WDEwVHcyUXB3NXRUbTA4bGx0dE1ORlM3WnI2cEhGcFlpRTQ5NVp5cw=='
+          }
+        });
+        const states = await response.json();
+        const stateSelect = document.getElementById('state');
+        states.forEach(state => {
+          const option = document.createElement('option');
+          option.value = state.iso2;
+          option.textContent = state.name;
+          stateSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading states:', error);
+      }
+    }
+
+    // Fetch and populate cities based on selected state
+    async function loadCities(stateIso2) {
+      try {
+        const response = await fetch(`https://api.countrystatecity.in/v1/countries/IN/states/${stateIso2}/cities`, {
+          method: 'GET',
+          headers: {
+            'X-CSCAPI-KEY': 'WDEwVHcyUXB3NXRUbTA4bGx0dE1ORlM3WnI2cEhGcFlpRTQ5NVp5cw=='
+          }
+        });
+        const cities = await response.json();
+        const citySelect = document.getElementById('city');
+        citySelect.innerHTML = '<option value="" selected>Select City</option>'; // Reset city options
+        cities.forEach(city => {
+          const option = document.createElement('option');
+          option.value = city.id;
+          option.textContent = city.name;
+          citySelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading cities:', error);
+      }
+    }
+
+    // Event listener for state change
+    document.getElementById('state').addEventListener('change', function() {
+      const stateIso2 = this.value;
+      if (stateIso2) {
+        loadCities(stateIso2);
+      } else {
+        document.getElementById('city').innerHTML = '<option value="" selected>Select City</option>'; // Reset city options
+      }
+    });
+
+    // Load states on page load
+    loadStates();
   </script>
 </body>
 </html>

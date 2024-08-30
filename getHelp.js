@@ -1,10 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-// Initialize Firebase
+// Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyDr-UzzwWiGA7jt_IMQWIjX-2fioeT_Kn4",
+    apiKey: "AIzaSyBQc8nvdP9XM2EEgH3eUS10JECKVR9Bl8M",
     authDomain: "safetyapp-cf8d9.firebaseapp.com",
     projectId: "safetyapp-cf8d9",
     storageBucket: "safetyapp-cf8d9.appspot.com",
@@ -12,133 +12,127 @@ const firebaseConfig = {
     appId: "1:868230322213:web:b0eca4dc7d5d8a200dc7cc"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Handle contact number input
-document.getElementById('contact').addEventListener('input', (e) => {
-    const contactInput = e.target;
-    const contactError = document.getElementById('contactError');
-    const value = contactInput.value;
+// API Key for fetching states and cities
+const apiKey = 'WDEwVHcyUXB3NXRUbTA4bGx0dE1ORlM3WnI2cEhGcFlpRTQ5NVp5cw==';
 
-    const digitsOnly = value.replace(/\D/g, '');
-    contactInput.value = digitsOnly;
-
-    if (digitsOnly.length !== 10) {
-        contactError.style.display = 'block';
-        contactError.textContent = 'Contact number must be exactly 10 digits.';
-    } else {
-        contactError.style.display = 'none';
-    }
-});
-
-// Handle form submission
-document.getElementById('getHelpForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const description = document.getElementById('description').value;
-    const city = document.getElementById('location').value;
-    const contact = document.getElementById('contact').value;
-    const status = 'pending';
-    const timestamp = Timestamp.fromDate(new Date());
-
-    // Get current position
-    const position = window.currentPosition;
-    if (!position) {
-        alert('Unable to get current location. Please try again.');
-        return;
-    }
-    const { latitude: lat, longitude: lng } = position;
-
-    const user = auth.currentUser;
-    const userId = user ? user.uid : 'anonymous';
-
-    if (contact.length !== 10) {
-        alert('Contact number must be exactly 10 digits.');
-        return;
-    }
-
+// Function to fetch states
+async function fetchStates() {
     try {
-        await addDoc(collection(db, 'helpRequests'), {
-            description,
-            city,
-            contact,
-            status,
-            timestamp,
-            userId,
-            location: { lat, lng } // Store the location coordinates
+        const response = await fetch('https://api.countrystatecity.in/v1/countries/IN/states', {
+            headers: {
+                'X-CSCAPI-KEY': apiKey
+            }
         });
 
-        // Disable the submit button
-        const submitButton = document.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-
-        // Show success popup and redirect after OK is clicked
-        if (confirm('Help request submitted successfully! Click OK to return to the home page.')) {
-            window.location.href = 'index.html';
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-    } catch (e) {
-        console.error('Error adding document: ', e);
-        alert('Failed to submit request. Please try again.');
+        const data = await response.json();
+        console.log('Fetched States:', data);
+
+        const stateSelect = document.getElementById('stateSelect');
+        if (Array.isArray(data)) {
+            data.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state.iso2;
+                option.textContent = state.name;
+                stateSelect.appendChild(option);
+            });
+        } else {
+            console.error('Unexpected data format:', data);
+        }
+    } catch (error) {
+        console.error('Error fetching states:', error);
+    }
+}
+
+// Function to fetch cities
+async function fetchCities(stateCode) {
+    try {
+        const response = await fetch(`https://api.countrystatecity.in/v1/countries/IN/states/${stateCode}/cities`, {
+            headers: {
+                'X-CSCAPI-KEY': apiKey
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Fetched Cities:', data);
+
+        const citySelect = document.getElementById('citySelect');
+        citySelect.innerHTML = ''; // Clear previous options
+
+        if (Array.isArray(data)) {
+            data.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city.name;
+                option.textContent = city.name;
+                citySelect.appendChild(option);
+            });
+        } else {
+            console.error('Unexpected data format:', data);
+        }
+    } catch (error) {
+        console.error('Error fetching cities:', error);
+    }
+}
+
+// Event listener for state selection
+document.getElementById('stateSelect').addEventListener('change', (e) => {
+    const stateCode = e.target.value;
+    if (stateCode) {
+        fetchCities(stateCode);
     }
 });
 
-// MapmyIndia location finder code
-document.getElementById('findLocationBtn').addEventListener('click', function() {
+// Call this function to populate the state dropdown on page load
+fetchStates();
+
+// Function to initialize the map and place a marker using Leaflet
+function displayMap(lat, lng) {
+    const map = L.map('map').setView([lat, lng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    L.marker([lat, lng]).addTo(map)
+        .bindPopup('You are here')
+        .openPopup();
+}
+
+// Function to get the user's current position
+function showPosition(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    document.getElementById('status').textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+
+    window.currentPosition = { latitude, longitude };
+
+    displayMap(latitude, longitude);
+}
+
+// Function to get the user's location
+function getLocation() {
     if (navigator.geolocation) {
         document.getElementById('status').textContent = 'Locating...';
 
-        // Request high accuracy location
         navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true });
     } else {
         document.getElementById('status').textContent = 'Geolocation is not supported by this browser.';
     }
-});
-
-function showPosition(position) {
-    const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-
-    document.getElementById('status').textContent = `Latitude: ${lat}, Longitude: ${lng}`;
-
-    // Store the current position globally for use in form submission
-    window.currentPosition = { latitude: lat, longitude: lng };
-
-    // Call the reverse geocoding function to get the city name
-    getCityName(lat, lng);
-
-    var map = new MapmyIndia.Map('map', {
-        center: [lat, lng],
-        zoom: 15,
-        zoomControl: true,
-        hybrid: true
-    });
-
-    new MapmyIndia.Marker({
-        position: [lat, lng],
-        map: map,
-        title: 'You are here'
-    });
 }
 
-function getCityName(lat, lng) {
-    const apiKey = 'f0901418c9b1deb823ea2e4a532d9ffd';
-    const reverseGeocodeUrl = `https://apis.mapmyindia.com/advancedmaps/v1/${apiKey}/rev_geocode?lat=${lat}&lng=${lng}`;
-
-    fetch(reverseGeocodeUrl)
-        .then(response => response.json())
-        .then(data => {
-            const city = data.results[0].city;
-            document.getElementById('location').value = city;
-        })
-        .catch(error => {
-            console.error('Error fetching city name:', error);
-            document.getElementById('status').textContent = 'Failed to retrieve city name.';
-        });
-}
-
+// Function to handle geolocation errors
 function showError(error) {
     switch (error.code) {
         case error.PERMISSION_DENIED:
@@ -156,7 +150,80 @@ function showError(error) {
     }
 }
 
-// Handle "Back To Home" button click
-document.getElementById('backToHomeBtn').addEventListener('click', () => {
+// Event listener for "Get My Location" button
+document.getElementById('findLocationBtn').addEventListener('click', function() {
+    getLocation();
+});
+
+// Contact validation function
+function validateContact(contact) {
+    const contactPattern = /^\d{10}$/;
+    return contactPattern.test(contact);
+}
+
+// Handle form submission
+document.getElementById('submitRequestBtn').addEventListener('click', async () => {
+    const description = document.getElementById('description').value;
+    const city = document.getElementById('citySelect').value;
+    const state = document.getElementById('stateSelect').value;
+    const contact = document.getElementById('contact').value;
+    const gender = document.getElementById('gender').value;
+    const status = 'pending';
+    const timestamp = Timestamp.fromDate(new Date());
+
+    // Check if the user's current position is available
+    const position = window.currentPosition;
+    if (!position) {
+        showAlert('Unable to get current location. Please try again.', 'error');
+        return;
+    }
+    const { latitude: lat, longitude: lng } = position;
+
+    const user = auth.currentUser;
+    const userId = user ? user.uid : 'anonymous';
+
+    if (!validateContact(contact)) {
+        document.getElementById('contactError').style.display = 'block';
+        return;
+    } else {
+        document.getElementById('contactError').style.display = 'none';
+    }
+
+    try {
+        await addDoc(collection(db, 'helpRequests'), {
+            description,
+            city,
+            state,
+            gender,
+            contact,
+            status,
+            timestamp,
+            userId,
+            location: { lat, lng }
+        });
+
+        showAlert('Help request submitted successfully!', 'success');
+        document.getElementById('submitRequestBtn').disabled = true;
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000); // Redirect after 2 seconds
+
+    } catch (e) {
+        console.error('Error adding document: ', e);
+        showAlert('Failed to submit request. Please try again.', 'error');
+    }
+});
+
+// Function to show alert messages
+function showAlert(message, type) {
+    const alertBox = document.createElement('div');
+    alertBox.className = `alert ${type}`;
+    alertBox.textContent = message;
+    document.body.appendChild(alertBox);
+    setTimeout(() => {
+        alertBox.remove();
+    }, 5000); // Remove alert after 5 seconds
+}
+
+// Event listener for "Back To Home" button
+document.getElementById('backToHomeBtn').addEventListener('click', function () {
     window.location.href = 'index.html';
 });
