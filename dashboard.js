@@ -1,6 +1,7 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
-import { getDoc, doc, getDocs, collection, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+import { getDoc, doc, onSnapshot, collection, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+import { signOut } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
 
 // Haversine distance function
 function haversineDistance(lat1, lon1, lat2, lon2) {
@@ -69,18 +70,17 @@ async function displayUserDetails(user) {
     }
 }
 
-// Function to display pending help requests and sort by distance
-async function displayPendingRequests(userCity) {
-    try {
-        if (!userCity) {
-            console.log('User city is not available.');
-            return;
-        }
+// Function to display pending help requests and sort by distance with real-time updates
+function displayPendingRequests(userCity) {
+    if (!userCity) {
+        console.log('User city is not available.');
+        return;
+    }
 
-        // Query to get help requests for the specific city
-        const q = query(collection(db, 'helpRequests'), where('city', '==', userCity), where('status', '==', 'pending'));
-        const requestsSnapshot = await getDocs(q);
-        const requests = requestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Real-time listener for help requests
+    const q = query(collection(db, 'helpRequests'), where('city', '==', userCity), where('status', '==', 'pending'));
+    onSnapshot(q, async (snapshot) => {
+        const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         // Get current location
         const location = await getCurrentLocation();
@@ -113,7 +113,7 @@ async function displayPendingRequests(userCity) {
                 <td id="status-${request.id}">${request.status || 'N/A'}</td>
                 <td>
                     <button class="btn btn-success mark-completed-btn" data-id="${request.id}">Mark as Completed</button>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${request.location.lat},${request.location.lng}" target="_blank" class="btn btn-primary">Navigate to Location</a>
+                    <a href="#" class="btn btn-primary navigate-btn" data-lat="${request.location.lat}" data-lng="${request.location.lng}">Navigate to Location</a>
                 </td>
             `;
             requestsTable.appendChild(row);
@@ -126,9 +126,7 @@ async function displayPendingRequests(userCity) {
         document.getElementById('nearestRequest').textContent = `Nearest Request Distance: ${nearestRequestDistance}`;
 
         addEventListeners(); // Add event listeners to newly added buttons
-    } catch (error) {
-        console.error('Error fetching help requests:', error);
-    }
+    });
 }
 
 // Function to mark a request as completed
@@ -143,6 +141,7 @@ async function markAsCompleted(requestId) {
         // Update the status in the UI
         document.getElementById(`status-${requestId}`).textContent = 'Completed';
 
+        // Refresh the requests list
         const user = auth.currentUser; // Refresh user details to get city
         const userData = await displayUserDetails(user); // Refresh user details
         if (userData) {
@@ -153,12 +152,31 @@ async function markAsCompleted(requestId) {
     }
 }
 
-// Add event listeners to buttons for marking requests as completed
+// Add event listeners to buttons for marking requests as completed and navigation
 function addEventListeners() {
     document.querySelectorAll('.mark-completed-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             const requestId = event.target.getAttribute('data-id');
             markAsCompleted(requestId);
+        });
+    });
+
+    document.querySelectorAll('.navigate-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault(); // Prevent default link behavior
+            const destinationLat = parseFloat(event.target.getAttribute('data-lat'));
+            const destinationLng = parseFloat(event.target.getAttribute('data-lng'));
+
+            try {
+                // Get the current location of the volunteer
+                const volunteerLocation = await getCurrentLocation();
+
+                // Open Google Maps navigation with real-time coordinates
+                const navigationUrl = `https://www.google.com/maps/dir/?api=1&origin=${volunteerLocation.latitude},${volunteerLocation.longitude}&destination=${destinationLat},${destinationLng}&travelmode=driving`;
+                window.open(navigationUrl, '_blank');
+            } catch (error) {
+                console.error('Error fetching current location for navigation:', error);
+            }
         });
     });
 }
@@ -174,7 +192,6 @@ onAuthStateChanged(auth, async (user) => {
         window.location.href = 'login.html'; // Redirect to login page if not authenticated
     }
 });
-import { signOut } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
 
 // Function to handle logout
 function handleLogout() {
