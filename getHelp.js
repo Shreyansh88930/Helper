@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, Timestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, Timestamp, doc, updateDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -127,10 +127,11 @@ function showError(error) {
 }
 
 // Function to start watching the user's location
+let watchId;
 function startWatchingPosition() {
     if (navigator.geolocation) {
         document.getElementById('status').textContent = 'Locating...';
-        navigator.geolocation.watchPosition(updatePosition, showError, { enableHighAccuracy: true });
+        watchId = navigator.geolocation.watchPosition(updatePosition, showError, { enableHighAccuracy: true });
     } else {
         document.getElementById('status').textContent = 'Geolocation is not supported by this browser.';
     }
@@ -151,9 +152,19 @@ async function updatePosition(position) {
 
     try {
         const helpRequestRef = doc(collection(db, 'helpRequests'), userId);
-        await updateDoc(helpRequestRef, {
-            location: { lat: latitude, lng: longitude }
-        });
+        const helpRequestDoc = await getDoc(helpRequestRef);
+
+        if (helpRequestDoc.exists()) {
+            const helpRequestData = helpRequestDoc.data();
+            if (helpRequestData.status !== 'completed') {
+                await updateDoc(helpRequestRef, {
+                    location: { lat: latitude, lng: longitude }
+                });
+            } else {
+                // Stop watching position if the request is completed
+                navigator.geolocation.clearWatch(watchId);
+            }
+        }
     } catch (e) {
         console.error('Error updating document: ', e);
     }
@@ -228,5 +239,23 @@ function showAlert(message, type) {
 
 // Event listener for "Back To Home" button
 document.getElementById('backToHomeBtn').addEventListener('click', () => {
-    window.location.href = 'index.html';
+    window.location.href = 'index.html'; // Redirect to home page
 });
+
+// Handle real-time updates for help requests
+const user = auth.currentUser;
+const userId = user ? user.uid : 'anonymous';
+
+const helpRequestRef = doc(db, 'helpRequests', userId);
+
+onSnapshot(helpRequestRef, (doc) => {
+    const helpRequestData = doc.data();
+    if (helpRequestData && helpRequestData.status === 'completed') {
+        // Stop watching position updates
+        navigator.geolocation.clearWatch(watchId);
+        document.getElementById('status').textContent = 'Your help request has been completed.';
+        document.getElementById('findLocationBtn').disabled = true;
+        document.getElementById('submitRequestBtn').disabled = true;
+    }
+});
+
