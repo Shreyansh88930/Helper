@@ -29,6 +29,11 @@ function getCurrentLocation() {
                 },
                 (error) => {
                     reject(error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 5000
                 }
             );
         } else {
@@ -52,7 +57,6 @@ async function displayUserDetails(user) {
             userNameElement.textContent = `${userData.firstName} ${userData.lastName}`;
             userEmailElement.textContent = userData.email;
             userCityElement.textContent = userData.city;
-            console.log('User Details:', userData); // Debug logging
             return userData; // Return user data for use in displaying help requests
         } else {
             console.log('No such document!');
@@ -70,6 +74,32 @@ async function displayUserDetails(user) {
     }
 }
 
+// Initialize Leaflet map and add live location tracking
+let map, userMarker;
+
+function initializeMap() {
+    map = L.map('map').setView([0, 0], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    userMarker = L.marker([0, 0]).addTo(map);
+}
+
+async function updateUserLocation(position) {
+    try {
+        const { latitude, longitude } = position.coords;
+        if (map && userMarker) {
+            map.setView([latitude, longitude], 13);
+            userMarker.setLatLng([latitude, longitude]);
+        }
+    } catch (error) {
+        console.error('Error updating user location:', error);
+    }
+}
+
 // Function to display pending help requests and sort by distance with real-time updates
 function displayPendingRequests(userCity) {
     if (!userCity) {
@@ -84,7 +114,6 @@ function displayPendingRequests(userCity) {
 
         // Get current location
         const location = await getCurrentLocation();
-        console.log('Current Location:', location); // Debug logging
 
         // Calculate distance for each request and sort by distance
         requests.forEach(request => {
@@ -171,40 +200,63 @@ function addEventListeners() {
                 // Get the current location of the volunteer
                 const volunteerLocation = await getCurrentLocation();
 
-                // Open Google Maps navigation with real-time coordinates
-                const navigationUrl = `https://www.google.com/maps/dir/?api=1&origin=${volunteerLocation.latitude},${volunteerLocation.longitude}&destination=${destinationLat},${destinationLng}&travelmode=driving`;
-                window.open(navigationUrl, '_blank');
+                // Open Leaflet map with real-time coordinates
+                map.setView([volunteerLocation.latitude, volunteerLocation.longitude], 13);
+
+                // Add a marker for the current location
+                L.marker([volunteerLocation.latitude, volunteerLocation.longitude], { icon: L.icon({ iconUrl: 'your-icon-url.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowUrl: 'your-shadow-url.png', shadowSize: [41, 41] }) }).addTo(map)
+                    .bindPopup('You are here!')
+                    .openPopup();
+
+                // Add a marker for the destination
+                L.marker([destinationLat, destinationLng]).addTo(map)
+                    .bindPopup('Destination!')
+                    .openPopup();
+
+                // Draw a line between the current location and destination
+                L.polyline([[volunteerLocation.latitude, volunteerLocation.longitude], [destinationLat, destinationLng]], { color: 'blue' }).addTo(map);
             } catch (error) {
-                console.error('Error fetching current location for navigation:', error);
+                console.error('Error navigating to location:', error);
             }
         });
     });
 }
 
-// Initialize Firebase Authentication state observer
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const userData = await displayUserDetails(user); // Ensure user details are displayed
-        if (userData) {
-            await displayPendingRequests(userData.city); // Display pending requests
-        }
-    } else {
-        window.location.href = 'login.html'; // Redirect to login page if not authenticated
+// Handle sign-out
+async function handleSignOut() {
+    try {
+        await signOut(auth);
+        console.log('User signed out successfully.');
+        window.location.href = 'index.html'; // Redirect to home page
+    } catch (error) {
+        console.error('Error signing out:', error);
     }
-});
+}
 
-// Function to handle logout
-function handleLogout() {
-    signOut(auth).then(() => {
-        console.log('User signed out.');
-        window.location.href = 'login.html'; // Redirect to the login page
-    }).catch((error) => {
-        console.error('Error during sign out:', error);
+// Initialize everything
+async function initializeDashboard() {
+    initializeMap();
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userData = await displayUserDetails(user);
+            if (userData) {
+                await displayPendingRequests(userData.city);
+            }
+            navigator.geolocation.watchPosition(updateUserLocation, (error) => {
+                console.error('Error watching user location:', error);
+            }, {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 5000
+            });
+
+            // Handle sign-out button click
+            document.getElementById('signOutBtn').addEventListener('click', handleSignOut);
+        } else {
+            window.location.href = 'index.html'; // Redirect to home page if not logged in
+        }
     });
 }
 
-// Add event listener to the logout link
-document.getElementById('logoutLink').addEventListener('click', (event) => {
-    event.preventDefault(); // Prevent the default link behavior
-    handleLogout(); // Call the logout function
-});
+initializeDashboard();
