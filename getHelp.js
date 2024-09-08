@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, Timestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -126,18 +126,41 @@ function showError(error) {
     }
 }
 
-// Function to get the user's location
-function getLocation() {
+// Function to start watching the user's location
+function startWatchingPosition() {
     if (navigator.geolocation) {
         document.getElementById('status').textContent = 'Locating...';
-        navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true });
+        navigator.geolocation.watchPosition(updatePosition, showError, { enableHighAccuracy: true });
     } else {
         document.getElementById('status').textContent = 'Geolocation is not supported by this browser.';
     }
 }
 
+// Function to update the position and Firestore
+async function updatePosition(position) {
+    const { latitude, longitude } = position.coords;
+
+    document.getElementById('status').textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+
+    window.currentPosition = { latitude, longitude };
+    displayMap(latitude, longitude);
+
+    // Update Firestore with new position
+    const user = auth.currentUser;
+    const userId = user ? user.uid : 'anonymous';
+
+    try {
+        const helpRequestRef = doc(collection(db, 'helpRequests'), userId);
+        await updateDoc(helpRequestRef, {
+            location: { lat: latitude, lng: longitude }
+        });
+    } catch (e) {
+        console.error('Error updating document: ', e);
+    }
+}
+
 // Event listener for "Get My Location" button
-document.getElementById('findLocationBtn').addEventListener('click', getLocation);
+document.getElementById('findLocationBtn').addEventListener('click', startWatchingPosition);
 
 // Contact validation function
 function validateContact(contact) {

@@ -88,24 +88,62 @@ function initializeMap() {
     userMarker = L.marker([0, 0]).addTo(map);
 }
 
+function updateMapAndRoute(volunteerLat, volunteerLng, destinationLat, destinationLng) {
+    if (map && userMarker) {
+        map.setView([volunteerLat, volunteerLng], 13);
+        userMarker.setLatLng([volunteerLat, volunteerLng]);
+
+        if (routeControl) {
+            map.removeControl(routeControl);
+        }
+
+        routeControl = L.Routing.control({
+            waypoints: [
+                L.latLng(volunteerLat, volunteerLng),
+                L.latLng(destinationLat, destinationLng)
+            ],
+            routeWhileDragging: true
+        }).addTo(map);
+    }
+}
+
 async function updateUserLocation(position) {
     try {
         const { latitude, longitude } = position.coords;
-        if (map && userMarker) {
-            map.setView([latitude, longitude], 13);
-            userMarker.setLatLng([latitude, longitude]);
 
-            // Update the route if it exists
-            if (routeControl) {
-                routeControl.setWaypoints([
-                    L.latLng(latitude, longitude),
-                    routeControl.getWaypoints()[1] // Keep the destination waypoint unchanged
-                ]);
-            }
+        // Update the user's location on the map
+        userMarker.setLatLng([latitude, longitude]);
+        map.setView([latitude, longitude], 13);
+
+        // Fetch the nearest request and update route
+        const userCity = document.getElementById('userCity').textContent;
+        const nearestRequest = await fetchNearestRequest(userCity, latitude, longitude);
+
+        if (nearestRequest) {
+            updateMapAndRoute(latitude, longitude, nearestRequest.location.lat, nearestRequest.location.lng);
         }
     } catch (error) {
         console.error('Error updating user location:', error);
     }
+}
+
+async function fetchNearestRequest(userCity, userLat, userLng) {
+    if (!userCity) {
+        console.log('User city is not available.');
+        return null;
+    }
+
+    const q = query(collection(db, 'helpRequests'), where('city', '==', userCity), where('status', '==', 'pending'));
+    const snapshot = await getDocs(q);
+    const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    requests.forEach(request => {
+        request.distance = haversineDistance(userLat, userLng, request.location.lat, request.location.lng);
+    });
+
+    requests.sort((a, b) => a.distance - b.distance);
+
+    return requests.length > 0 ? requests[0] : null;
 }
 
 // Function to display pending help requests and sort by distance with real-time updates
@@ -115,27 +153,18 @@ async function displayPendingRequests(userCity) {
         return;
     }
 
-    // Real-time listener for help requests
     const q = query(collection(db, 'helpRequests'), where('city', '==', userCity), where('status', '==', 'pending'));
     onSnapshot(q, async (snapshot) => {
         const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Get current location
         const location = await getCurrentLocation();
 
-        // Calculate distance for each request and sort by distance
         requests.forEach(request => {
-            request.distance = haversineDistance(
-                location.latitude,
-                location.longitude,
-                request.location.lat,
-                request.location.lng
-            );
+            request.distance = haversineDistance(location.latitude, location.longitude, request.location.lat, request.location.lng);
         });
 
         requests.sort((a, b) => a.distance - b.distance);
 
-        // Update requests table
         const requestsTable = document.getElementById('requestsTable');
         requestsTable.innerHTML = '';
 
@@ -158,7 +187,6 @@ async function displayPendingRequests(userCity) {
 
         document.getElementById('pendingRequests').textContent = `Pending Requests: ${requests.length}`;
 
-        // Display the distance of the nearest request
         const nearestRequestDistance = requests.length > 0 ? `${requests[0].distance.toFixed(2)} km` : 'N/A';
         document.getElementById('nearestRequest').textContent = `Nearest Request Distance: ${nearestRequestDistance}`;
 
@@ -175,14 +203,12 @@ async function markAsCompleted(requestId) {
         });
         console.log(`Request ${requestId} marked as completed.`);
 
-        // Update the status in the UI
         document.getElementById(`status-${requestId}`).textContent = 'Completed';
 
-        // Refresh the requests list
-        const user = auth.currentUser; // Refresh user details to get city
-        const userData = await displayUserDetails(user); // Refresh user details
+        const user = auth.currentUser;
+        const userData = await displayUserDetails(user);
         if (userData) {
-            await displayPendingRequests(userData.city); // Refresh the requests list
+            await displayPendingRequests(userData.city);
         }
     } catch (error) {
         console.error('Error marking request as completed:', error);
@@ -199,85 +225,47 @@ function addEventListeners() {
     });
 
     document.querySelectorAll('.navigate-btn').forEach(button => {
-        button.addEventListener('click', async (event) => {
-            event.preventDefault(); // Prevent default link behavior
+        button.addEventListener('click', (event) => {
+            const lat = parseFloat(event.target.getAttribute('data-lat'));
+            const lng = parseFloat(event.target.getAttribute('data-lng'));
 
-            const destinationLat = parseFloat(event.target.getAttribute('data-lat'));
-            const destinationLng = parseFloat(event.target.getAttribute('data-lng'));
-
-            try {
-                // Get the current location of the volunteer
-                const volunteerLocation = await getCurrentLocation();
-
-                // Open Leaflet map with real-time coordinates
-                map.setView([volunteerLocation.latitude, volunteerLocation.longitude], 13);
-
-                // Clear previous routes if any
-                if (routeControl) {
-                    map.removeControl(routeControl);
-                }
-
-                // Add a marker for the current location
-                L.marker([volunteerLocation.latitude, volunteerLocation.longitude], {
-                    icon: L.icon({
-                        iconUrl: 'your-icon-url.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowUrl: 'your-shadow-url.png',
-                        shadowSize: [41, 41]
-                    })
-                }).addTo(map)
-                .bindPopup('You are here!')
-                .openPopup();
-
-                // Add a marker for the destination
-                L.marker([destinationLat, destinationLng]).addTo(map)
-                .bindPopup('Destination!')
-                .openPopup();
-
-                // Initialize Leaflet Routing Machine to display route
-                routeControl = L.Routing.control({
-                    waypoints: [
-                        L.latLng(volunteerLocation.latitude, volunteerLocation.longitude),
-                        L.latLng(destinationLat, destinationLng)
-                    ],
-                    routeWhileDragging: true
-                }).addTo(map);
-
-            } catch (error) {
-                console.error('Error navigating to location:', error);
-            }
+            updateMapAndRoute(userMarker.getLatLng().lat, userMarker.getLatLng().lng, lat, lng);
         });
     });
 }
 
-// Initialize Firebase Authentication state listener
+// Logout function
+async function logout() {
+    try {
+        await signOut(auth);
+        console.log('User logged out.');
+        window.location.href = 'home.html'; // Redirect to home page
+    } catch (error) {
+        console.error('Error logging out:', error);
+    }
+}
+
+// Check user authentication status and set up map and real-time updates
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // User is signed in
+        console.log('User logged in:', user.uid);
+
+        initializeMap();
         const userData = await displayUserDetails(user);
         if (userData) {
-            initializeMap();
             displayPendingRequests(userData.city);
 
-            // Set up live location tracking
+            // Start watching user's location
             navigator.geolocation.watchPosition(updateUserLocation, (error) => {
-                console.error('Error watching position:', error);
+                console.error('Error watching user location:', error);
+            }, {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 5000
             });
         }
     } else {
-        // User is signed out
-        window.location.href = 'login.html'; // Redirect to login page if user is not authenticated
-    }
-});
-
-// Logout functionality
-document.getElementById('logout').addEventListener('click', async () => {
-    try {
-        await signOut(auth);
-        window.location.href = 'login.html';
-    } catch (error) {
-        console.error('Error signing out:', error);
+        console.log('No user logged in.');
+        window.location.href = 'login.html'; // Redirect to login page
     }
 });
