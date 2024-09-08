@@ -75,7 +75,7 @@ async function displayUserDetails(user) {
 }
 
 // Initialize Leaflet map and add live location tracking
-let map, userMarker;
+let map, userMarker, routeControl;
 
 function initializeMap() {
     map = L.map('map').setView([0, 0], 13);
@@ -94,6 +94,14 @@ async function updateUserLocation(position) {
         if (map && userMarker) {
             map.setView([latitude, longitude], 13);
             userMarker.setLatLng([latitude, longitude]);
+
+            // Update the route if it exists
+            if (routeControl) {
+                routeControl.setWaypoints([
+                    L.latLng(latitude, longitude),
+                    routeControl.getWaypoints()[1] // Keep the destination waypoint unchanged
+                ]);
+            }
         }
     } catch (error) {
         console.error('Error updating user location:', error);
@@ -101,7 +109,7 @@ async function updateUserLocation(position) {
 }
 
 // Function to display pending help requests and sort by distance with real-time updates
-function displayPendingRequests(userCity) {
+async function displayPendingRequests(userCity) {
     if (!userCity) {
         console.log('User city is not available.');
         return;
@@ -193,6 +201,7 @@ function addEventListeners() {
     document.querySelectorAll('.navigate-btn').forEach(button => {
         button.addEventListener('click', async (event) => {
             event.preventDefault(); // Prevent default link behavior
+
             const destinationLat = parseFloat(event.target.getAttribute('data-lat'));
             const destinationLng = parseFloat(event.target.getAttribute('data-lng'));
 
@@ -203,18 +212,39 @@ function addEventListeners() {
                 // Open Leaflet map with real-time coordinates
                 map.setView([volunteerLocation.latitude, volunteerLocation.longitude], 13);
 
+                // Clear previous routes if any
+                if (routeControl) {
+                    map.removeControl(routeControl);
+                }
+
                 // Add a marker for the current location
-                L.marker([volunteerLocation.latitude, volunteerLocation.longitude], { icon: L.icon({ iconUrl: 'your-icon-url.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowUrl: 'your-shadow-url.png', shadowSize: [41, 41] }) }).addTo(map)
-                    .bindPopup('You are here!')
-                    .openPopup();
+                L.marker([volunteerLocation.latitude, volunteerLocation.longitude], {
+                    icon: L.icon({
+                        iconUrl: 'your-icon-url.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowUrl: 'your-shadow-url.png',
+                        shadowSize: [41, 41]
+                    })
+                }).addTo(map)
+                .bindPopup('You are here!')
+                .openPopup();
 
                 // Add a marker for the destination
                 L.marker([destinationLat, destinationLng]).addTo(map)
-                    .bindPopup('Destination!')
-                    .openPopup();
+                .bindPopup('Destination!')
+                .openPopup();
 
-                // Draw a line between the current location and destination
-                L.polyline([[volunteerLocation.latitude, volunteerLocation.longitude], [destinationLat, destinationLng]], { color: 'blue' }).addTo(map);
+                // Initialize Leaflet Routing Machine to display route
+                routeControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(volunteerLocation.latitude, volunteerLocation.longitude),
+                        L.latLng(destinationLat, destinationLng)
+                    ],
+                    routeWhileDragging: true
+                }).addTo(map);
+
             } catch (error) {
                 console.error('Error navigating to location:', error);
             }
@@ -222,41 +252,32 @@ function addEventListeners() {
     });
 }
 
-// Handle sign-out
-async function handleSignOut() {
+// Initialize Firebase Authentication state listener
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // User is signed in
+        const userData = await displayUserDetails(user);
+        if (userData) {
+            initializeMap();
+            displayPendingRequests(userData.city);
+
+            // Set up live location tracking
+            navigator.geolocation.watchPosition(updateUserLocation, (error) => {
+                console.error('Error watching position:', error);
+            });
+        }
+    } else {
+        // User is signed out
+        window.location.href = 'login.html'; // Redirect to login page if user is not authenticated
+    }
+});
+
+// Logout functionality
+document.getElementById('logout').addEventListener('click', async () => {
     try {
         await signOut(auth);
-        console.log('User signed out successfully.');
-        window.location.href = 'index.html'; // Redirect to home page
+        window.location.href = 'login.html';
     } catch (error) {
         console.error('Error signing out:', error);
     }
-}
-
-// Initialize everything
-async function initializeDashboard() {
-    initializeMap();
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const userData = await displayUserDetails(user);
-            if (userData) {
-                await displayPendingRequests(userData.city);
-            }
-            navigator.geolocation.watchPosition(updateUserLocation, (error) => {
-                console.error('Error watching user location:', error);
-            }, {
-                enableHighAccuracy: true,
-                maximumAge: 0,
-                timeout: 5000
-            });
-
-            // Handle sign-out button click
-            document.getElementById('signOutBtn').addEventListener('click', handleSignOut);
-        } else {
-            window.location.href = 'index.html'; // Redirect to home page if not logged in
-        }
-    });
-}
-
-initializeDashboard();
+});
