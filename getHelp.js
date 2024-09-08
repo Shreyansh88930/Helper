@@ -221,7 +221,8 @@ document.getElementById('submitRequestBtn').addEventListener('click', async () =
 
         showAlert('Help request submitted successfully!', 'success');
         document.getElementById('submitRequestBtn').disabled = true;
-        setTimeout(() => { window.location.href = 'index.html'; }, 2000); // Redirect after 2 seconds
+
+        // No redirection after submission, allowing location tracking to continue
     } catch (e) {
         console.error('Error adding document: ', e);
         showAlert('Failed to submit request. Please try again.', 'error');
@@ -237,11 +238,6 @@ function showAlert(message, type) {
     setTimeout(() => { alertBox.remove(); }, 5000); // Remove alert after 5 seconds
 }
 
-// Event listener for "Back To Home" button
-document.getElementById('backToHomeBtn').addEventListener('click', () => {
-    window.location.href = 'index.html'; // Redirect to home page
-});
-
 // Handle real-time updates for help requests
 const user = auth.currentUser;
 const userId = user ? user.uid : 'anonymous';
@@ -255,7 +251,5 @@ onSnapshot(helpRequestRef, (doc) => {
         navigator.geolocation.clearWatch(watchId);
         document.getElementById('status').textContent = 'Your help request has been completed.';
         document.getElementById('findLocationBtn').disabled = true;
-        document.getElementById('submitRequestBtn').disabled = true;
     }
 });
-

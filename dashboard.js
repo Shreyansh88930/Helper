@@ -48,31 +48,47 @@ async function displayUserDetails(user) {
     const userEmailElement = document.getElementById('userEmail');
     const userCityElement = document.getElementById('userCity');
 
-    const userDocRef = doc(db, 'users', user.uid);
+    if (!user) {
+        console.log('No user is logged in.');
+        return;
+    }
+
+    const userDocRef = doc(db, 'users', user.uid); // Assuming 'users' is the Firestore collection
 
     try {
+        // Fetch the user's document from Firestore
         const docSnap = await getDoc(userDocRef);
+        
         if (docSnap.exists()) {
             const userData = docSnap.data();
-            userNameElement.textContent = `${userData.firstName} ${userData.lastName}`;
-            userEmailElement.textContent = userData.email;
-            userCityElement.textContent = userData.city;
-            return userData; // Return user data for use in displaying help requests
+            
+            // Ensure the data contains the expected fields
+            if (userData.firstName && userData.lastName && userData.email && userData.city) {
+                userNameElement.textContent = `${userData.firstName} ${userData.lastName}`;
+                userEmailElement.textContent = userData.email;
+                userCityElement.textContent = userData.city;
+                return userData; // Return the user data for other functions
+            } else {
+                console.error('User data is incomplete.');
+                userNameElement.textContent = 'User data is incomplete';
+                userEmailElement.textContent = 'User data is incomplete';
+                userCityElement.textContent = 'User data is incomplete';
+            }
         } else {
-            console.log('No such document!');
+            console.log('No such document exists in Firestore for the user.');
             userNameElement.textContent = 'User data not found';
             userEmailElement.textContent = 'User data not found';
             userCityElement.textContent = 'User data not found';
-            return null;
         }
     } catch (error) {
-        console.error('Error fetching user details: ', error);
+        console.error('Error fetching user details from Firestore:', error);
         userNameElement.textContent = 'Error fetching details';
         userEmailElement.textContent = 'Error fetching details';
         userCityElement.textContent = 'Error fetching details';
-        return null;
     }
+    return null;
 }
+
 
 // Initialize Leaflet map and add live location tracking
 let map, userMarker, routeControl;
@@ -150,7 +166,7 @@ async function displayPendingRequests(userCity) {
                 <td id="status-${request.id}">${request.status || 'N/A'}</td>
                 <td>
                     <button class="btn btn-success mark-completed-btn" data-id="${request.id}">Mark as Completed</button>
-                    <a href="#" class="btn btn-primary navigate-btn" data-lat="${request.location.lat}" data-lng="${request.location.lng}">Navigate to Location</a>
+                    <a href="#" class="btn btn-primary navigate-btn" data-id="${request.id}">Navigate to Location</a>
                 </td>
             `;
             requestsTable.appendChild(row);
@@ -202,82 +218,142 @@ function addEventListeners() {
         button.addEventListener('click', async (event) => {
             event.preventDefault(); // Prevent default link behavior
 
-            const destinationLat = parseFloat(event.target.getAttribute('data-lat'));
-            const destinationLng = parseFloat(event.target.getAttribute('data-lng'));
+            const requestId = event.target.getAttribute('data-id');
+            const requestDocRef = doc(db, 'helpRequests', requestId);
 
             try {
-                // Get the current location of the volunteer
-                const volunteerLocation = await getCurrentLocation();
+                // Real-time listener for help seeker location updates
+                onSnapshot(requestDocRef, async (doc) => {
+                    const request = doc.data();
 
-                // Open Leaflet map with real-time coordinates
-                map.setView([volunteerLocation.latitude, volunteerLocation.longitude], 13);
+                    // Get the current location of the volunteer
+                    const volunteerLocation = await getCurrentLocation();
 
-                // Clear previous routes if any
-                if (routeControl) {
-                    map.removeControl(routeControl);
-                }
+                    // Open Leaflet map with real-time coordinates
+                    map.setView([volunteerLocation.latitude, volunteerLocation.longitude], 13);
 
-                // Add a marker for the current location
-                L.marker([volunteerLocation.latitude, volunteerLocation.longitude], {
-                    icon: L.icon({
-                        iconUrl: 'your-icon-url.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowUrl: 'your-shadow-url.png',
-                        shadowSize: [41, 41]
-                    })
-                }).addTo(map)
-                .bindPopup('You are here!')
-                .openPopup();
+                    // Clear previous routes if any
+                    if (routeControl) {
+                        map.removeControl(routeControl);
+                    }
 
-                // Add a marker for the destination
-                L.marker([destinationLat, destinationLng]).addTo(map)
-                .bindPopup('Destination!')
-                .openPopup();
+                    // Add a marker for the current location
+                    L.marker([volunteerLocation.latitude, volunteerLocation.longitude], {
+                        icon: L.icon({
+                            iconUrl: 'your-icon-url.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [0, -41]
+                        })
+                    }).addTo(map).bindPopup('Your location').openPopup();
 
-                // Initialize Leaflet Routing Machine to display route
-                routeControl = L.Routing.control({
-                    waypoints: [
-                        L.latLng(volunteerLocation.latitude, volunteerLocation.longitude),
-                        L.latLng(destinationLat, destinationLng)
-                    ],
-                    routeWhileDragging: true
-                }).addTo(map);
+                    // Add a marker for the help seeker's location
+                    const helpSeekerMarker = L.marker([request.location.lat, request.location.lng], {
+                        icon: L.icon({
+                            iconUrl: 'your-icon-url.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [0, -41]
+                        })
+                    }).addTo(map).bindPopup('Help seeker location').openPopup();
 
+                    // Draw a route between the two locations
+                    routeControl = L.Routing.control({
+                        waypoints: [
+                            L.latLng(volunteerLocation.latitude, volunteerLocation.longitude),
+                            L.latLng(request.location.lat, request.location.lng)
+                        ],
+                        routeWhileDragging: true,
+                        createMarker: function () { return null; } // Disable default markers
+                    }).addTo(map);
+                });
             } catch (error) {
-                console.error('Error navigating to location:', error);
+                console.error('Error fetching help request location:', error);
             }
         });
     });
 }
 
-// Initialize Firebase Authentication state listener
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        // User is signed in
-        const userData = await displayUserDetails(user);
-        if (userData) {
-            initializeMap();
-            displayPendingRequests(userData.city);
-
-            // Set up live location tracking
-            navigator.geolocation.watchPosition(updateUserLocation, (error) => {
-                console.error('Error watching position:', error);
-            });
-        }
+// Logout functionality
+function setupLogoutListener() {
+    const logoutButton = document.getElementById('logoutButton');
+    
+    // Check if the logoutButton exists before adding the event listener
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                console.log('User logged out successfully.');
+                window.location.href = '../index.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        });
     } else {
-        // User is signed out
-        window.location.href = 'login.html'; // Redirect to login page if user is not authenticated
+        console.error('Logout button not found.');
     }
+}
+
+// Initialize the map when the page loads
+window.addEventListener('load', () => {
+    initializeMap();
+
+    // Check if the user is authenticated and display their details
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log('User is logged in:', user.email);
+            const userData = await displayUserDetails(user);
+
+            // Fetch and display pending help requests for the user's city
+            if (userData) {
+                await displayPendingRequests(userData.city);
+            }
+        } else {
+            console.log('No user is logged in.');
+            window.location.href = '../login.html'; // Redirect to the login page if no user is logged in
+        }
+    });
+
+    // Watch user's location for real-time updates
+    navigator.geolocation.watchPosition(updateUserLocation, (error) => {
+        console.error('Error watching user location:', error);
+    }, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000
+    });
+
+    // Setup logout button listener after the DOM has fully loaded
+    setupLogoutListener();
 });
 
-// Logout functionality
-document.getElementById('logout').addEventListener('click', async () => {
-    try {
-        await signOut(auth);
-        window.location.href = 'login.html';
-    } catch (error) {
-        console.error('Error signing out:', error);
-    }
+
+// Initialize the map when the page loads
+window.addEventListener('load', () => {
+    initializeMap();
+
+    // Check if the user is authenticated and display their details
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log('User is logged in:', user.email);
+            const userData = await displayUserDetails(user);
+
+            // Fetch and display pending help requests for the user's city
+            if (userData) {
+                await displayPendingRequests(userData.city);
+            }
+        } else {
+            console.log('No user is logged in.');
+            window.location.href = '../login.html'; // Redirect to the login page if no user is logged in
+        }
+    });
+
+    // Watch user's location for real-time updates
+    navigator.geolocation.watchPosition(updateUserLocation, (error) => {
+        console.error('Error watching user location:', error);
+    }, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000
+    });
 });
