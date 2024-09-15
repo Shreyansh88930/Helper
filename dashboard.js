@@ -1,7 +1,11 @@
 import { auth, db } from './firebase.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
-import { getDoc, doc, onSnapshot, collection, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
-import { signOut } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+import { getDoc, doc, getDocs, collection, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+
+// Initialize EmailJS
+(function() {
+    emailjs.init("fD-o5PaC1ewfFYIGL"); // Your EmailJS user ID
+})();
 
 // Haversine distance function
 function haversineDistance(lat1, lon1, lat2, lon2) {
@@ -29,11 +33,6 @@ function getCurrentLocation() {
                 },
                 (error) => {
                     reject(error);
-                },
-                {
-                    enableHighAccuracy: true,
-                    maximumAge: 0,
-                    timeout: 5000
                 }
             );
         } else {
@@ -48,208 +47,176 @@ async function displayUserDetails(user) {
     const userEmailElement = document.getElementById('userEmail');
     const userCityElement = document.getElementById('userCity');
 
-    if (!user) {
-        console.log('No user is logged in.');
-        return;
-    }
-
     const userDocRef = doc(db, 'users', user.uid);
 
     try {
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
             const userData = docSnap.data();
-            if (userData.firstName && userData.lastName && userData.email && userData.city) {
-                userNameElement.textContent = `${userData.firstName} ${userData.lastName}`;
-                userEmailElement.textContent = userData.email;
-                userCityElement.textContent = userData.city;
-                return userData;
-            } else {
-                userNameElement.textContent = 'User data is incomplete';
-                userEmailElement.textContent = 'User data is incomplete';
-                userCityElement.textContent = 'User data is incomplete';
-            }
+            userNameElement.textContent = `${userData.firstName} ${userData.lastName}`;
+            userEmailElement.textContent = userData.email;
+            userCityElement.textContent = userData.city;
+            console.log('User Details:', userData); // Debug logging
+            return userData; // Return user data for use in displaying help requests
         } else {
+            console.log('No such document!');
             userNameElement.textContent = 'User data not found';
             userEmailElement.textContent = 'User data not found';
             userCityElement.textContent = 'User data not found';
+            return null;
         }
     } catch (error) {
+        console.error('Error fetching user details: ', error);
         userNameElement.textContent = 'Error fetching details';
         userEmailElement.textContent = 'Error fetching details';
         userCityElement.textContent = 'Error fetching details';
+        return null;
     }
-    return null;
 }
 
-// Initialize Leaflet map and add live location tracking
-let map, userMarker, routeControl;
-
-// Initialize WebSocket
-const ws = new WebSocket('ws://localhost:8080'); // Replace with your WebSocket server URL
-
-ws.onopen = () => {
-    console.log('WebSocket connection established');
-};
-
-ws.onmessage = (event) => {
-    // Handle incoming WebSocket messages
-    const data = JSON.parse(event.data);
-    if (data.type === 'update_location') {
-        // Update map with received location data
-        console.log('Received location update:', data);
-        if (userMarker) {
-            userMarker.setLatLng([data.latitude, data.longitude]);
-            map.setView([data.latitude, data.longitude], 13);
+// Function to display pending help requests and sort by distance
+async function displayPendingRequests(userCity) {
+    try {
+        if (!userCity) {
+            console.log('User city is not available.');
+            return;
         }
-    }
-};
 
-// Function to initialize the map
-function initializeMap() {
-    map = L.map('map').setView([0, 0], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+        // Query to get help requests for the specific city
+        const q = query(collection(db, 'helpRequests'), where('city', '==', userCity), where('status', '==', 'pending'));
+        const requestsSnapshot = await getDocs(q);
+        const requests = requestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    if (userMarker) {
-        userMarker.remove();
-    }
-    userMarker = L.marker([0, 0]).addTo(map);
-    routeControl = L.Routing.control({
-        waypoints: [],
-        routeWhileDragging: true,
-        geocoder: L.Control.Geocoder.nominatim(),
-    }).addTo(map);
+        // Get current location
+        const location = await getCurrentLocation();
+        console.log('Current Location:', location); // Debug logging
 
-    // Optionally, fetch and display the current location of the user
-    getCurrentLocation().then(position => {
-        userMarker.setLatLng([position.latitude, position.longitude]);
-        map.setView([position.latitude, position.longitude], 13);
+        // Calculate distance for each request and sort by distance
+        requests.forEach(request => {
+            request.distance = haversineDistance(
+                location.latitude,
+                location.longitude,
+                request.location.lat,
+                request.location.lng
+            );
 
-        // Send initial location to WebSocket server
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({
-                type: 'update_location',
-                latitude: position.latitude,
-                longitude: position.longitude
-            }));
-        }
-    }).catch(error => {
-        console.error('Error getting current location:', error);
-    });
-}
-
-// Function to display help requests on the dashboard
-async function displayHelpRequests() {
-    const requestsTable = document.getElementById('requestsTable');
-    requestsTable.innerHTML = ''; // Clear existing rows
-
-    const q = query(collection(db, 'helpRequests'), where('status', '==', 'pending'));
-    onSnapshot(q, async (querySnapshot) => {
-        requestsTable.innerHTML = ''; // Clear existing rows
-
-        const userLocation = await getCurrentLocation();
-        let nearestDistance = Infinity;
-        let nearestRequest = null;
-
-        querySnapshot.forEach((doc) => {
-            const request = doc.data();
-            const requestId = doc.id;
-            const requestLocation = {
-                latitude: request.location.lat,
-                longitude: request.location.lng
-            };
-
-            const distance = haversineDistance(userLocation.latitude, userLocation.longitude, requestLocation.latitude, requestLocation.longitude);
-
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestRequest = {
-                    id: requestId,
-                    ...request
-                };
+            // Check and log timestamp data
+            if (request.timestamp) {
+                console.log('Timestamp Data:', request.timestamp); // Debug logging
+            } else {
+                console.error('Timestamp is missing for request ID:', request.id);
             }
+        });
 
+        requests.sort((a, b) => a.distance - b.distance);
+
+        // Update requests table
+        const requestsTable = document.getElementById('requestsTable');
+        requestsTable.innerHTML = '';
+
+        requests.forEach(request => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${requestId}</td>
-                <td>${request.city}</td>
-                <td>${request.description}</td>
-                <td>${request.contact}</td>
-                <td>${request.timestamp.toDate().toLocaleString()}</td>
-                <td>${request.status}</td>
+                <td>${request.id || 'N/A'}</td>
+                <td>${request.city || 'N/A'}</td>
+                <td>${request.description || 'N/A'}</td>
+                <td>${request.contact || 'N/A'}</td>
+                <td>${request.timestamp ? new Date(request.timestamp.seconds * 1000).toLocaleString() : 'N/A'}</td>
+                <td id="status-${request.id}">${request.status || 'N/A'}</td>
                 <td>
-                    <button class="btn btn-success" onclick="markRequestCompleted('${requestId}')">Mark Completed</button>
-                    <button class="btn btn-info" onclick="navigateToRequest(${requestLocation.latitude}, ${requestLocation.longitude})">Navigate</button>
+                    <button class="btn btn-success mark-completed-btn" data-id="${request.id}">Mark as Completed</button>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${request.location.lat},${request.location.lng}" target="_blank" class="btn btn-primary">Navigate to Location</a>
                 </td>
             `;
             requestsTable.appendChild(row);
         });
 
-        if (nearestRequest) {
-            document.getElementById('nearestRequest').textContent = `Nearest Request: ${nearestRequest.city}, Distance: ${nearestDistance.toFixed(2)} km`;
-            routeControl.setWaypoints([
-                L.latLng(userLocation.latitude, userLocation.longitude),
-                L.latLng(nearestRequest.location.lat, nearestRequest.location.lng)
-            ]);
-        }
-    });
-}
+        document.getElementById('pendingRequests').textContent = `Pending Requests: ${requests.length}`;
 
-// Function to mark a help request as completed
-async function markRequestCompleted(requestId) {
-    const requestDocRef = doc(db, 'helpRequests', requestId);
-    try {
-        await updateDoc(requestDocRef, { status: 'completed' });
-        console.log('Request marked as completed');
+        // Display the distance of the nearest request
+        const nearestRequestDistance = requests.length > 0 ? `${requests[0].distance.toFixed(2)} km` : 'N/A';
+        document.getElementById('nearestRequest').textContent = `Nearest Request Distance: ${nearestRequestDistance}`;
 
-        // Notify WebSocket server about the update if needed
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({
-                type: 'request_update',
-                requestId: requestId,
-                status: 'completed'
-            }));
-        }
+        addEventListeners(); // Add event listeners to newly added buttons
     } catch (error) {
-        console.error('Error marking request as completed: ', error);
+        console.error('Error fetching help requests:', error);
     }
 }
 
-// Function to navigate to a help request
-function navigateToRequest(lat, lon) {
-    map.setView([lat, lon], 13);
-    routeControl.setWaypoints([
-        L.latLng(userMarker.getLatLng().lat, userMarker.getLatLng().lng),
-        L.latLng(lat, lon)
-    ]);
+// Function to mark a request as completed and send an email
+async function markAsCompleted(requestId) {
+    try {
+        const requestRef = doc(db, 'helpRequests', requestId);
+        const requestSnap = await getDoc(requestRef);
+        
+        if (!requestSnap.exists()) {
+            console.log('Request not found.');
+            return;
+        }
+
+        const requestData = requestSnap.data();
+        await updateDoc(requestRef, {
+            status: 'Completed'
+        });
+        console.log(`Request ${requestId} marked as completed.`);
+
+        // Send email
+        const emailParams = {
+            to_email: requestData.email, // Assuming the contact field contains the email
+            subject: 'Help Request Completed',
+            message: `Your help request with ID ${requestId} has been marked as completed. Thank you for using Safety Initiative!`
+        };
+
+        emailjs.send('service_aatvjah', 'template_e7j0df5', emailParams)
+            .then(response => {
+                console.log('Email sent successfully:', response);
+            }, error => {
+                console.error('Error sending email:', error);
+            });
+
+        // Update the status in the UI
+        document.getElementById(`status-${requestId}`).textContent = 'Completed';
+
+        const user = auth.currentUser; // Refresh user details to get city
+        const userData = await displayUserDetails(user); // Refresh user details
+        if (userData) {
+            await displayPendingRequests(userData.city); // Refresh the requests list
+        }
+    } catch (error) {
+        console.error('Error marking request as completed:', error);
+    }
 }
 
-// Function to set up event listeners
+// Add event listeners to buttons for marking requests as completed
 function addEventListeners() {
-    document.getElementById('logoutLink').addEventListener('click', () => {
-        signOut(auth).then(() => {
-            window.location.href = 'login.html'; // Redirect to login page
-        }).catch((error) => {
-            console.error('Sign out error: ', error);
+    document.querySelectorAll('.mark-completed-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const requestId = event.target.getAttribute('data-id');
+            markAsCompleted(requestId);
         });
     });
 }
 
-// Function to initialize the dashboard
-function initializeDashboard() {
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            await displayUserDetails(user);
-            await displayHelpRequests();
-            initializeMap();
-            addEventListeners();
-        } else {
-            window.location.href = 'login.html'; // Redirect to login if not logged in
+// Initialize Firebase Authentication state observer
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const userData = await displayUserDetails(user); // Ensure user details are displayed
+        if (userData) {
+            await displayPendingRequests(userData.city); // Display pending requests
         }
+    } else {
+        window.location.href = 'login.html'; // Redirect to login page if not authenticated
+    }
+});
+
+// Function to handle logout
+function handleLogout() {
+    signOut(auth).then(() => {
+        console.log('User signed out.');
+        window.location.href = 'index.html'; // Redirect to home page
+    }).catch((error) => {
+        console.error('Error signing out:', error);
     });
 }
 
-// Initialize the dashboard on page load
-document.addEventListener('DOMContentLoaded', initializeDashboard);
+document.getElementById('logoutLink').addEventListener('click', handleLogout);

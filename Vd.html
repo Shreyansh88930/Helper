@@ -6,11 +6,16 @@
     <title>Volunteer Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="Vd.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+</script>
+<script type="text/javascript">
+(function(){
+  emailjs.init({
+    publicKey: "fD-o5PaC1ewfFYIGL",
+  });
+})();
+</script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -71,14 +76,22 @@
                     </tr>
                 </thead>
                 <tbody id="requestsTable">
-                    <!-- Table rows will be dynamically added here -->
+                    <tr>
+                        <td data-label="ID">1</td>
+                        <td data-label="City">New York</td>
+                        <td data-label="Description">Assistance Needed</td>
+                        <td data-label="Contact">123-456-7890</td>
+                        <td data-label="Date & Time">2023-08-28 12:00</td>
+                        <td data-label="Status">Pending</td>
+                        <td data-label="Action">
+                            <div class="action-buttons">
+                                <a href="#" class="btn btn-success">Mark Completed</a>
+                                <a href="#" class="btn btn-primary">Navigate</a>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
-        </section>
-
-        <section id="mapSection" class="mb-4">
-            <h2>Live Map</h2>
-            <div id="map" style="height: 500px;"></div>
         </section>
     </main>
 

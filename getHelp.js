@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, Timestamp, doc, updateDoc, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -20,39 +20,23 @@ const db = getFirestore(app);
 // API Key for fetching states and cities
 const apiKey = 'WDEwVHcyUXB3NXRUbTA4bGx0dE1ORlM3WnI2cEhGcFlpRTQ5NVp5cw==';
 
-// WebSocket setup
-let ws = new WebSocket('ws://localhost:8080'); // Replace with your WebSocket server URL
-
-ws.onopen = () => {
-    console.log('WebSocket connection established');
-};
-
-ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data.type === 'update_location') {
-        // Handle incoming location updates
-        console.log('Received location update:', data);
-    }
-};
-
-ws.onerror = (error) => {
-    console.error('WebSocket error:', error);
-    showAlert('WebSocket error. Please try again later.', 'error');
-};
-
 // Function to fetch states
 async function fetchStates() {
     try {
         const response = await fetch('https://api.countrystatecity.in/v1/countries/IN/states', {
-            headers: { 'X-CSCAPI-KEY': apiKey }
+            headers: {
+                'X-CSCAPI-KEY': apiKey
+            }
         });
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
         const data = await response.json();
-        const stateSelect = document.getElementById('stateSelect');
-        stateSelect.innerHTML = ''; // Clear previous options
+        console.log('Fetched States:', data);
 
+        const stateSelect = document.getElementById('stateSelect');
         if (Array.isArray(data)) {
             data.forEach(state => {
                 const option = document.createElement('option');
@@ -72,12 +56,18 @@ async function fetchStates() {
 async function fetchCities(stateCode) {
     try {
         const response = await fetch(`https://api.countrystatecity.in/v1/countries/IN/states/${stateCode}/cities`, {
-            headers: { 'X-CSCAPI-KEY': apiKey }
+            headers: {
+                'X-CSCAPI-KEY': apiKey
+            }
         });
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
         const data = await response.json();
+        console.log('Fetched Cities:', data);
+
         const citySelect = document.getElementById('citySelect');
         citySelect.innerHTML = ''; // Clear previous options
 
@@ -100,135 +90,78 @@ async function fetchCities(stateCode) {
 document.getElementById('stateSelect').addEventListener('change', (e) => {
     const stateCode = e.target.value;
     if (stateCode) {
-        console.log(`Fetching cities for state code: ${stateCode}`);
         fetchCities(stateCode);
-    } else {
-        document.getElementById('citySelect').innerHTML = ''; // Clear cities if no state is selected
     }
 });
 
-// Populate the state dropdown on page load
+// Call this function to populate the state dropdown on page load
 fetchStates();
 
 // Function to initialize the map and place a marker using Leaflet
-let mapInitialized = false;
-let map;
-
 function displayMap(lat, lng) {
-    const mapContainer = document.getElementById('map');
-
-    // Initialize the map only if it's not already initialized
-    if (!mapInitialized) {
-        map = L.map('map').setView([lat, lng], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        mapInitialized = true;
-    } else {
-        map.setView([lat, lng], 15); // Update the map view if already initialized
-    }
+    const map = L.map('map').setView([lat, lng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
     L.marker([lat, lng]).addTo(map)
         .bindPopup('You are here')
         .openPopup();
 }
 
-// Function to handle geolocation success
+// Function to get the user's current position
 function showPosition(position) {
-    const { latitude, longitude } = position.coords;
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
 
     document.getElementById('status').textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
 
     window.currentPosition = { latitude, longitude };
+
     displayMap(latitude, longitude);
-
-    // Send real-time location via WebSocket
-    if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-            type: 'update_location',
-            latitude: latitude,
-            longitude: longitude
-        }));
-    }
 }
 
-// Function to handle geolocation errors
-function showError(error) {
-    const status = document.getElementById('status');
-
-    switch (error.code) {
-        case error.PERMISSION_DENIED:
-            status.textContent = 'User denied the request for Geolocation.';
-            break;
-        case error.POSITION_UNAVAILABLE:
-            status.textContent = 'Location information is unavailable.';
-            break;
-        case error.TIMEOUT:
-            status.textContent = 'The request to get user location timed out.';
-            break;
-        case error.UNKNOWN_ERROR:
-            status.textContent = 'An unknown error occurred.';
-            break;
-    }
-}
-
-// Function to start watching the user's location
-let watchId;
-function startWatchingPosition() {
+// Function to get the user's location
+function getLocation() {
     if (navigator.geolocation) {
         document.getElementById('status').textContent = 'Locating...';
-        watchId = navigator.geolocation.watchPosition(updatePosition, showError, { enableHighAccuracy: true });
+
+        navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true });
     } else {
         document.getElementById('status').textContent = 'Geolocation is not supported by this browser.';
     }
 }
 
-// Function to update the position and Firestore
-async function updatePosition(position) {
-    const { latitude, longitude } = position.coords;
-
-    document.getElementById('status').textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
-
-    window.currentPosition = { latitude, longitude };
-    displayMap(latitude, longitude);
-
-    // Update Firestore with new position
-    const user = auth.currentUser;
-    const userId = user ? user.uid : 'anonymous';
-
-    try {
-        const helpRequestQuery = query(collection(db, 'helpRequests'), where('userId', '==', userId));
-        const querySnapshot = await getDocs(helpRequestQuery);
-
-        querySnapshot.forEach(async (doc) => {
-            const helpRequestRef = doc.ref;
-            await updateDoc(helpRequestRef, {
-                location: { lat: latitude, lng: longitude }
-            });
-        });
-
-        // Send real-time location via WebSocket
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({
-                type: 'update_location',
-                latitude: latitude,
-                longitude: longitude
-            }));
-        }
-    } catch (e) {
-        console.error('Error updating document: ', e);
+// Function to handle geolocation errors
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            document.getElementById('status').textContent = 'User denied the request for Geolocation.';
+            break;
+        case error.POSITION_UNAVAILABLE:
+            document.getElementById('status').textContent = 'Location information is unavailable.';
+            break;
+        case error.TIMEOUT:
+            document.getElementById('status').textContent = 'The request to get user location timed out.';
+            break;
+        case error.UNKNOWN_ERROR:
+            document.getElementById('status').textContent = 'An unknown error occurred.';
+            break;
     }
 }
 
 // Event listener for "Get My Location" button
-document.getElementById('findLocationBtn').addEventListener('click', startWatchingPosition);
+document.getElementById('findLocationBtn').addEventListener('click', function() {
+    getLocation();
+});
 
 // Contact validation function
 function validateContact(contact) {
-    return /^\d{10}$/.test(contact);
+    const contactPattern = /^\d{10}$/;
+    return contactPattern.test(contact);
 }
 
+// Handle form submission
 // Handle form submission
 document.getElementById('submitRequestBtn').addEventListener('click', async () => {
     const description = document.getElementById('description').value;
@@ -236,54 +169,64 @@ document.getElementById('submitRequestBtn').addEventListener('click', async () =
     const state = document.getElementById('stateSelect').value;
     const contact = document.getElementById('contact').value;
     const gender = document.getElementById('gender').value;
-    const { latitude, longitude } = window.currentPosition || {};
+    const email = document.getElementById('email').value;  // Get email from input
+    const status = 'pending';
+    const timestamp = Timestamp.fromDate(new Date());
 
-    if (!description || !city || !state || !contact || !gender) {
-        showAlert('All fields are required.', 'error');
+    // Check if the user's current position is available
+    const position = window.currentPosition;
+    if (!position) {
+        showAlert('Unable to get current location. Please try again.', 'error');
         return;
     }
+    const { latitude: lat, longitude: lng } = position;
+
+    const userId = 'anonymous';  // Keeping userId as 'anonymous' if no authentication
 
     if (!validateContact(contact)) {
-        showAlert('Contact number must be 10 digits.', 'error');
+        document.getElementById('contactError').style.display = 'block';
         return;
-    }
-
-    if (!latitude || !longitude) {
-        showAlert('Location is required. Please click "Get My Location" first.', 'error');
-        return;
+    } else {
+        document.getElementById('contactError').style.display = 'none';
     }
 
     try {
-        const newRequestId = doc(collection(db, 'helpRequests')).id; // Generate unique ID for the new request
-        const docRef = doc(db, 'helpRequests', newRequestId);
-        await setDoc(docRef, {
-            contact,
-            gender,
+        await addDoc(collection(db, 'helpRequests'), {
             description,
             city,
             state,
-            location: { lat: latitude, lng: longitude },
-            createdAt: Timestamp.now(),
-            userId: auth.currentUser ? auth.currentUser.uid : 'anonymous',
-            status: 'pending',
-            volunteerAssigned: null
+            gender,
+            contact,
+            email,  // Store email in Firestore
+            status,
+            timestamp,
+            userId,
+            location: { lat, lng }
         });
 
-        showAlert('Help request submitted successfully.', 'success');
-    } catch (error) {
-        console.error('Error adding document: ', error);
-        showAlert('Error submitting help request. Please try again.', 'error');
+        showAlert('Help request submitted successfully!', 'success');
+        document.getElementById('submitRequestBtn').disabled = true;
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000); // Redirect after 2 seconds
+
+    } catch (e) {
+        console.error('Error adding document: ', e);
+        showAlert('Failed to submit request. Please try again.', 'error');
     }
 });
 
 // Function to show alert messages
+// Function to show alert messages
 function showAlert(message, type) {
-    const alertBox = document.getElementById('alert');
+    const alertBox = document.createElement('div');
+    alertBox.className = `alert ${type}`;
     alertBox.textContent = message;
-    alertBox.className = `alert alert-${type}`;
-    alertBox.style.display = 'block';
-
+    document.body.appendChild(alertBox);
     setTimeout(() => {
-        alertBox.style.display = 'none';
-    }, 5000);
+        alertBox.remove();
+    }, 5000); // Remove alert after 5 seconds
 }
+
+// Event listener for "Back To Home" button
+document.getElementById('backToHomeBtn').addEventListener('click', function () {
+    window.location.href = 'index.html';
+});
